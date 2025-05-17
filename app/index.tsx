@@ -1,101 +1,125 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import {
+  View,
+  TextInput,
+  Button,
+  StyleSheet,
+  Text,
+  ScrollView,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native';
+import DropDownPicker from 'react-native-dropdown-picker';
 
 export default function HomeScreen() {
-  const [workoutType, setWorkoutType] = useState('');
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState(null);
+  const [items, setItems] = useState([
+    { label: 'Climbing', value: 'climbing' },
+    { label: 'Cycling', value: 'cycling' },
+    { label: 'Dance', value: 'dance' },
+    { label: 'Home Workouts', value: 'home_workouts' },
+    { label: 'Hiking', value: 'hiking' },
+    { label: 'Jogging', value: 'jogging' },
+    { label: 'Martial Arts', value: 'martial_arts' },
+    { label: 'Pilates', value: 'pilates' },
+    { label: 'Running', value: 'running' },
+    { label: 'Swimming', value: 'swimming' },
+    { label: 'Team Sports', value: 'team_sports' },
+    { label: 'Walking', value: 'walking' },
+    { label: 'Weightlifting', value: 'weightlifting' },
+    { label: 'Yoga', value: 'yoga' },
+  ]);
+
   const [duration, setDuration] = useState('');
 
   const handleCalculate = () => {
-    alert(`Υπολογισμός θερμίδων για ${workoutType}, διάρκεια: ${duration} λεπτά`);
+    if (value && duration) {
+      alert(`Workout: ${value}\nDuration: ${duration} minutes`);
+    } else {
+      alert('Please select a workout and enter duration.');
+    }
+  };
+
+  const handleTapOutside = () => {
+    Keyboard.dismiss();
+    setOpen(false);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.mainTitle}>Calculation of calories</Text>
+    <TouchableWithoutFeedback onPress={handleTapOutside}>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={styles.topHalf}>
+          <Text style={styles.label}>Workout type</Text>
+          <DropDownPicker
+            open={open}
+            value={value}
+            items={items}
+            setOpen={setOpen}
+            setValue={setValue}
+            setItems={setItems}
+            placeholder="Select workout type"
+            placeholderStyle={{ color: '#aaa' }}
+            style={styles.dropdown}
+            dropDownContainerStyle={{ maxHeight: 200, borderColor: '#ccc' }}
+            listMode="SCROLLVIEW"
+            scrollViewProps={{ nestedScrollEnabled: true }}
+          />
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Workout type</Text>
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={workoutType}
-            onValueChange={(itemValue) => setWorkoutType(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="type" value="" />
-            <Picker.Item label="Running" value="running" />
-            <Picker.Item label="Cycling" value="cycling" />
-            <Picker.Item label="Swimming" value="swimming" />
-            <Picker.Item label="HIIT" value="hiit" />
-          </Picker>
+          <Text style={styles.label}>Duration</Text>
+          <TextInput
+            style={styles.input}
+            keyboardType="numeric"
+            value={duration}
+            onChangeText={setDuration}
+            placeholder="minutes of workout"
+            placeholderTextColor="#aaa"
+          />
         </View>
-      </View>
 
-      <View style={styles.inputGroup}>
-        <Text style={styles.label}>Duration</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="minutes of training"
-          keyboardType="numeric"
-          value={duration}
-          onChangeText={setDuration}
-        />
-      </View>
-
-      <TouchableOpacity style={styles.button} onPress={handleCalculate}>
-        <Text style={styles.buttonText}>Calculate</Text>
-      </TouchableOpacity>
-    </View>
+        <Button title="Calculate" onPress={handleCalculate} />
+      </ScrollView>
+    </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'flex-start',
-    backgroundColor: '#fff',
+    padding: 20,
   },
-  mainTitle: {
-    fontSize: 22,
-    fontWeight: 'bold',
-    marginBottom: 30,
-    textAlign: 'center',
-  },
-  inputGroup: {
-    marginBottom: 25,
+  topHalf: {
+    height: '50%',
+    justifyContent: 'center',
   },
   label: {
-    fontSize: 16,
     marginBottom: 8,
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  pickerWrapper: {
-    borderWidth: 1,
+  dropdown: {
+    marginBottom: 20,
     borderColor: '#ccc',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  picker: {
-    height: 50,
-    width: '100%',
+    borderWidth: 1,
+    borderRadius: 5,
+    backgroundColor: '#f9f9f9',
+    padding: 10,
+    fontSize: 16,
+    color: '#333',
+    width: '50%',
   },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 8,
-    height: 50,
-    paddingHorizontal: 10,
-  },
-  button: {
-    backgroundColor: 'black',
-    paddingVertical: 15,
-    borderRadius: 10,
-    alignItems: 'center',
-    marginTop: 30,
-  },
-  buttonText: {
-    color: 'white',
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 20,
     fontSize: 16,
-    fontWeight: 'bold',
+    backgroundColor: '#f9f9f9',
+    width: '50%',
   },
 });
