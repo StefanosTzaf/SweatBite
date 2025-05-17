@@ -1,25 +1,17 @@
 import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 export default function Layout() {
   return (
     <>
-      {/* Κοινό header πάνω από τα tabs */}
-      <View style={{ paddingTop: 50, paddingBottom: 10, backgroundColor: 'tomato' }}>
-        <Text
-          style={{
-            textAlign: 'center',
-            color: 'white',
-            fontSize: 20,
-            fontWeight: 'bold',
-          }}
-        >
-          SweatBite
-        </Text>
+      {/* Custom header με εικονίδιο + όνομα */}
+      <View style={styles.header}>
+        <Ionicons name="flame" size={24} color="tomato" style={styles.icon} />
+        <Text style={styles.title}>SweatBite</Text>
       </View>
 
-      {/* Τα Tabs */}
+      {/* Tab Navigator */}
       <Tabs
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
@@ -37,10 +29,30 @@ export default function Layout() {
           tabBarInactiveTintColor: 'gray',
         })}
       >
-        <Tabs.Screen name="index" options={{ title: 'Burn' }} />
-        <Tabs.Screen name="nutrition" options={{ title: 'Food' }} />
-        <Tabs.Screen name="achievements" options={{ title: 'Goals' }} />
+        <Tabs.Screen name="index" options={{ title: 'Calories', headerShown: false }} />
+        <Tabs.Screen name="nutrition" options={{ title: 'Snacks', headerShown: false }} />
+        <Tabs.Screen name="achievements" options={{ title: 'Achievements', headerShown: false }} />
       </Tabs>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  header: {
+    height: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#ddd',
+  },
+  icon: {
+    marginRight: 8,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: 'tomato',
+  },
+});
