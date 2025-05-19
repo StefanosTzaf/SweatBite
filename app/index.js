@@ -2,12 +2,14 @@ import React, { useState } from 'react';
 import {
   View,
   TextInput,
-  Button,
   StyleSheet,
   Text,
   ScrollView,
   TouchableWithoutFeedback,
   Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
 
@@ -47,42 +49,51 @@ export default function HomeScreen() {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={handleTapOutside}>
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        keyboardShouldPersistTaps="handled"
-      >
-        <View style={styles.topHalf}>
-          <Text style={styles.label}>Workout type</Text>
-          <DropDownPicker
-            open={open}
-            value={value}
-            items={items}
-            setOpen={setOpen}
-            setValue={setValue}
-            setItems={setItems}
-            placeholder="Select workout type"
-            placeholderStyle={{ color: '#aaa' }}
-            style={styles.dropdown}
-            dropDownContainerStyle={{ maxHeight: 200, borderColor: '#ccc' }}
-            listMode="SCROLLVIEW"
-            scrollViewProps={{ nestedScrollEnabled: true }}
-          />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      style={{ flex: 1 }}
+    >
+      <TouchableWithoutFeedback onPress={handleTapOutside}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={styles.topHalf}>
+            <Text style={styles.label}>Workout Type</Text>
+            <View style={styles.inputWrapper}>
+              <DropDownPicker
+                open={open}
+                value={value}
+                items={items}
+                setOpen={setOpen}
+                setValue={setValue}
+                setItems={setItems}
+                placeholder="Select workout type"
+                placeholderStyle={{ color: '#aaa' }}
+                style={styles.dropdown}
+                dropDownContainerStyle={styles.dropdownContainer}
+                listMode="SCROLLVIEW"
+                scrollViewProps={{ nestedScrollEnabled: true }}
+              />
+            </View>
 
-          <Text style={styles.label}>Duration</Text>
-          <TextInput
-            style={styles.input}
-            keyboardType="numeric"
-            value={duration}
-            onChangeText={setDuration}
-            placeholder="minutes of workout"
-            placeholderTextColor="#aaa"
-          />
-        </View>
+            <Text style={styles.label}>Duration</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={duration}
+              onChangeText={setDuration}
+              placeholder="Minutes"
+              placeholderTextColor="#aaa"
+            />
+          </View>
 
-        <Button title="Calculate" onPress={handleCalculate} />
-      </ScrollView>
-    </TouchableWithoutFeedback>
+          <Pressable style={styles.calculateButton} onPress={handleCalculate}>
+            <Text style={styles.calculateButtonText}>Calculate</Text>
+          </Pressable>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -95,31 +106,58 @@ const styles = StyleSheet.create({
   topHalf: {
     height: '50%',
     justifyContent: 'center',
+    alignItems: 'left',
   },
   label: {
     marginBottom: 8,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: '600',
+    color: '#333',
+    alignSelf: 'flex-start',
+  },
+  inputWrapper: {
+    width: '50%',
+    zIndex: 1000, // Helps dropdown appear above other elements
+    marginBottom: 20,
   },
   dropdown: {
-    marginBottom: 20,
     borderColor: '#ccc',
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 8,
     backgroundColor: '#f9f9f9',
-    padding: 10,
-    fontSize: 16,
-    color: '#333',
-    width: '50%',
+  },
+  dropdownContainer: {
+    borderColor: '#ccc',
   },
   input: {
+    width: '50%',
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
     fontSize: 16,
     backgroundColor: '#f9f9f9',
-    width: '50%',
+    color: '#333',
+    marginBottom: 20,
+  },
+  calculateButton: {
+    backgroundColor: 'tomato',
+    paddingVertical: 14,
+    paddingHorizontal: 32,
+    borderRadius: 10,
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 20,
+    width: '60%',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+  },
+  calculateButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });

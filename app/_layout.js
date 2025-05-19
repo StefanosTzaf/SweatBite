@@ -1,17 +1,19 @@
 import { Tabs } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, SafeAreaView } from 'react-native';
 
 export default function Layout() {
   return (
     <>
-      {/* Custom header με εικονίδιο + όνομα */}
-      <View style={styles.header}>
-        <Ionicons name="flame" size={24} color="tomato" style={styles.icon} />
-        <Text style={styles.title}>SweatBite</Text>
-      </View>
+      {/* iOS-style header using SafeAreaView */}
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.header}>
+          <Ionicons name="flame" size={24} color="tomato" style={styles.icon} />
+          <Text style={styles.title}>SweatBite</Text>
+        </View>
+      </SafeAreaView>
 
-      {/* Tab Navigator */}
+      {/* iOS Tab Navigator */}
       <Tabs
         screenOptions={({ route }) => ({
           tabBarIcon: ({ color, size }) => {
@@ -27,6 +29,12 @@ export default function Layout() {
           },
           tabBarActiveTintColor: 'tomato',
           tabBarInactiveTintColor: 'gray',
+          tabBarStyle: {
+            backgroundColor: '#fff',
+            borderTopColor: '#eee',
+            paddingBottom: 6,
+            height: 60,
+          },
         })}
       >
         <Tabs.Screen name="index" options={{ title: 'Calories', headerShown: false }} />
@@ -38,12 +46,14 @@ export default function Layout() {
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    backgroundColor: '#fff',
+  },
   header: {
     height: 60,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#fff',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
