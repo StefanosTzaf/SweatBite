@@ -6,20 +6,28 @@ import {
   Pressable,
   Modal,
   TouchableOpacity,
+  ScrollView,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 
 export default function HomeScreen() {
-  const [duration, setDuration] = useState(30);
+  const [duration, setDuration] = useState(15);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
 
   const workoutData = [
-    { name: 'Running', emoji: '🏃' },
     { name: 'Cycling', emoji: '🚴' },
+    { name: 'Dancing', emoji: '💃' },
+    { name: 'Hiking', emoji: '🥾' },
+    { name: 'Home Workouts', emoji: '🏠' },
+    { name: 'Jogging', emoji: '🏃‍♂️' },
+    { name: 'Lifting Weights', emoji: '🏋️' },
+    { name: 'Martial arts', emoji: '🥋' },
+    { name: 'Running', emoji: '🏃' },
     { name: 'Swimming', emoji: '🏊' },
-    { name: 'HIIT', emoji: '🔥' },
-    { name: 'Yoga', emoji: '🧘' },
+    { name: 'Team Sports', emoji: '🏀' },
+    { name: 'Walking', emoji: '🚶' },
+    { name: 'Yoga-Pilates', emoji: '🧘' },
   ];
 
   return (
@@ -36,7 +44,8 @@ export default function HomeScreen() {
             ? `${selectedWorkout.emoji} ${selectedWorkout.name}`
             : '💪 Workout Type'}
         </Text>
-        <Text style={styles.arrow}>&gt;</Text> {/* Βελάκι πάντα */}
+        <Text style={styles.arrow}>{`>`}</Text>
+
       </Pressable>
 
       {/* Duration Slider */}
@@ -69,20 +78,22 @@ export default function HomeScreen() {
           <View style={styles.fullWidthModal}>
             <Text style={styles.modalTitle}>Select Workout</Text>
 
-            {workoutData.map((item) => (
-              <TouchableOpacity
-                key={item.name}
-                onPress={() => {
-                  setSelectedWorkout(item);
-                  setModalVisible(false);
-                }}
-                style={styles.modalWorkoutBox}
-              >
-                <Text style={styles.buttonText}>
-                  {item.emoji} {item.name}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            <ScrollView style={{ maxHeight: '85%', marginBottom: 10 }}>
+              {workoutData.map((item) => (
+                <TouchableOpacity
+                  key={item.name}
+                  onPress={() => {
+                    setSelectedWorkout(item);
+                    setModalVisible(false);
+                  }}
+                  style={styles.modalWorkoutBox}
+                >
+                  <Text style={styles.buttonText}>
+                    {item.emoji} {item.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
 
             <Pressable onPress={() => setModalVisible(false)}>
               <Text style={styles.modalCancel}>Cancel</Text>
@@ -177,6 +188,7 @@ const styles = StyleSheet.create({
   },
   fullWidthModal: {
     width: '100%',
+    height: '90%',
     backgroundColor: '#fff',
     borderTopLeftRadius: 20,
     borderTopRightRadius: 20,

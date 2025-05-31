@@ -1,5 +1,6 @@
 // app/_layout.js
 import React from 'react';
+import { useRouter } from 'expo-router';
 import { Tabs } from 'expo-router';
 import { Text, View, StyleSheet } from 'react-native';
 
