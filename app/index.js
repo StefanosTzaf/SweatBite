@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import * as Haptics from 'expo-haptics';
+import { MaterialIcons } from '@expo/vector-icons';
 import {
   View,
   Text,
@@ -16,19 +18,23 @@ export default function HomeScreen() {
   const [selectedWorkout, setSelectedWorkout] = useState(null);
 
   const workoutData = [
-    { name: 'Cycling', emoji: '🚴' },
-    { name: 'Dancing', emoji: '💃' },
-    { name: 'Hiking', emoji: '🥾' },
-    { name: 'Home Workouts', emoji: '🏠' },
-    { name: 'Jogging', emoji: '🏃‍♂️' },
-    { name: 'Lifting Weights', emoji: '🏋️' },
-    { name: 'Martial arts', emoji: '🥋' },
-    { name: 'Running', emoji: '🏃' },
-    { name: 'Swimming', emoji: '🏊' },
-    { name: 'Team Sports', emoji: '🏀' },
-    { name: 'Walking', emoji: '🚶' },
-    { name: 'Yoga-Pilates', emoji: '🧘' },
+    { name: 'Cycling', emoji: '🚴', caloriesPerMinute: 8 },
+    { name: 'Dancing', emoji: '💃', caloriesPerMinute: 6 },
+    { name: 'Hiking', emoji: '🥾', caloriesPerMinute: 7 },
+    { name: 'Home Workouts', emoji: '🏠', caloriesPerMinute: 5 },
+    { name: 'Jogging', emoji: '🏃‍♂️', caloriesPerMinute: 10 },
+    { name: 'Lifting Weights', emoji: '🏋️', caloriesPerMinute: 6 },
+    { name: 'Martial arts', emoji: '🥋', caloriesPerMinute: 9 },
+    { name: 'Running', emoji: '🏃', caloriesPerMinute: 12 },
+    { name: 'Swimming', emoji: '🏊', caloriesPerMinute: 11 },
+    { name: 'Team Sports', emoji: '🏀', caloriesPerMinute: 9 },
+    { name: 'Walking', emoji: '🚶', caloriesPerMinute: 4 },
+    { name: 'Yoga-Pilates', emoji: '🧘', caloriesPerMinute: 3 },
   ];
+
+  const caloriesBurned = selectedWorkout
+    ? selectedWorkout.caloriesPerMinute * duration
+    : 0;
 
   return (
     <View style={styles.container}>
@@ -38,22 +44,35 @@ export default function HomeScreen() {
       </Text>
 
       {/* Workout Selection Button */}
-      <Pressable style={styles.workoutBox} onPress={() => setModalVisible(true)}>
+      <Pressable
+        style={styles.workoutBox}
+        onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // vibration on open modal
+          setModalVisible(true);
+        }}
+      >
         <Text style={styles.buttonText}>
           {selectedWorkout
             ? `${selectedWorkout.emoji} ${selectedWorkout.name}`
             : '💪 Workout Type'}
         </Text>
-        <Text style={styles.arrow}>{`>`}</Text>
-
+        <MaterialIcons name="chevron-right" size={24} color="#555" />
       </Pressable>
 
       {/* Duration Slider */}
       <View style={styles.sliderBox}>
         <Text style={styles.label}>⏱ Duration</Text>
-        <Text style={styles.note}>Calories are calculated based on duration</Text>
+        <Text style={styles.note}>
+          Calories are calculated based on duration
+        </Text>
 
         <Text style={styles.durationText}>{duration} minutes</Text>
+
+        {selectedWorkout && (
+          <Text style={styles.caloriesText}>
+            🔥 Estimated calories burned: {caloriesBurned} kcal
+          </Text>
+        )}
 
         <View style={styles.sliderWrapper}>
           <Text style={styles.sliderEdgeLabel}>15 min</Text>
@@ -63,7 +82,10 @@ export default function HomeScreen() {
             maximumValue={120}
             step={1}
             value={duration}
-            onValueChange={(val) => setDuration(Math.round(val))}
+            onValueChange={(val) => {
+              setDuration(Math.round(val));
+              Haptics.selectionAsync(); // vibration on slider change
+            }}
             minimumTrackTintColor="tomato"
             maximumTrackTintColor="#ccc"
             thumbTintColor="tomato"
@@ -84,6 +106,7 @@ export default function HomeScreen() {
                   key={item.name}
                   onPress={() => {
                     setSelectedWorkout(item);
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // vibration on selection
                     setModalVisible(false);
                   }}
                   style={styles.modalWorkoutBox}
@@ -95,7 +118,12 @@ export default function HomeScreen() {
               ))}
             </ScrollView>
 
-            <Pressable onPress={() => setModalVisible(false)}>
+            <Pressable
+              onPress={() => {
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); // vibration on cancel
+                setModalVisible(false);
+              }}
+            >
               <Text style={styles.modalCancel}>Cancel</Text>
             </Pressable>
           </View>
@@ -113,7 +141,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fdfdfd',
   },
   title: {
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: '700',
     marginBottom: 10,
   },
@@ -148,7 +176,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 12,
-    backgroundColor: '#fafafa',
+    backgroundColor: '#e6f4ea',
   },
   label: {
     fontSize: 16,
@@ -166,6 +194,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 10,
     marginTop: 10,
+  },
+  caloriesText: {
+    textAlign: 'center',
+    fontSize: 16,
+    color: 'tomato',
+    fontWeight: 'bold',
+    marginBottom: 10,
   },
   sliderWrapper: {
     flexDirection: 'row',
