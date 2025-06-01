@@ -1,16 +1,29 @@
-// app/_layout.js
-import React from 'react';
-import { useRouter } from 'expo-router';
-import { Tabs } from 'expo-router';
-import { Text, View, StyleSheet } from 'react-native';
+import { Tabs, useRouter } from 'expo-router';
+import { useContext } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import { SnackStepContext, SnackStepProvider } from '../context/SnackStepContext';
 
-export default function Layout() {
+function LayoutContent() {
+  const router = useRouter();
+  const { step, setStep } = useContext(SnackStepContext);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
+        {/* Βελάκι μόνο αν step === 2 */}
+        {step === 2 && (
+          <Pressable
+            onPress={() => setStep(1)}
+            style={styles.backButton}
+            android_ripple={{ color: '#ccc', borderless: true }}
+          >
+            <Ionicons name="arrow-back" size={28} color="black" />
+          </Pressable>
+        )}
+
         <Text style={styles.title}>SweatBite</Text>
       </View>
-
 
       <Tabs
         screenOptions={({ route }) => ({
@@ -60,17 +73,35 @@ export default function Layout() {
   );
 }
 
+export default function Layout() {
+  return (
+    <SnackStepProvider>
+      <LayoutContent />
+    </SnackStepProvider>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   header: {
-    paddingTop: 50, // Για να κατέβει κάτω από το status bar
+    paddingTop: 50,
     paddingBottom: 10,
     backgroundColor: '#fff',
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center', // κεντράρει το title
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
+    position: 'relative', // για να τοποθετήσουμε το βελάκι απόλυτα
+  },
+  backButton: {
+    position: 'absolute',
+    left: 15,
+    padding: 4,
+    top: 50,
+    zIndex: 1,
   },
   title: {
     fontSize: 22,
