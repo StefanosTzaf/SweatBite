@@ -14,12 +14,14 @@ import {
 import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProgressContext } from '../context/ProgressContext';
+import { GoalsContext } from '../context/GoalsContext'; // Import GoalsContext
 
 export default function HomeScreen() {
   const [duration, setDuration] = useState(15);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const { progress, setProgress } = useContext(ProgressContext);
+  const { goals, updateGoalProgress } = useContext(GoalsContext); // Use GoalsContext
 
   const workoutData = [
     { name: 'Cycling', emoji: '🚴', caloriesPerMinute: 8 },
@@ -39,9 +41,6 @@ export default function HomeScreen() {
   const caloriesBurned = selectedWorkout
     ? selectedWorkout.caloriesPerMinute * duration
     : 0;
-
-  // Example calorie goal: 500 calories per day (can be dynamic or come from props/context)
-  const calorieGoal = 500;
 
   const handleSaveWorkout = async () => {
     if (!selectedWorkout) {
@@ -66,11 +65,19 @@ export default function HomeScreen() {
       workouts.push(newWorkout);
       await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
 
-      // Update progress if caloriesBurned affects goal
-      if (caloriesBurned > 0) {
-        const newProgress = Math.min(100, ((progress / 100) * calorieGoal + caloriesBurned) / calorieGoal * 100);
-        setProgress(newProgress);
-      }
+      // Update progress for calorie-related goals
+      goals
+        .filter((goal) => goal.type === 'Calories burned')
+        .forEach((goal) => {
+          updateGoalProgress('Calories burned', goal.period, caloriesBurned);
+        });
+
+      // Update progress for workout-related goals
+      goals
+        .filter((goal) => goal.type === 'Number of workouts per week')
+        .forEach((goal) => {
+          updateGoalProgress('Number of workouts per week', goal.period, 1); // Increment by 1 workout
+        });
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Saved', 'Your workout was saved successfully!');
