@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import * as Haptics from 'expo-haptics';
 import { MaterialIcons } from '@expo/vector-icons';
 import {
@@ -9,13 +9,17 @@ import {
   Modal,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ProgressContext } from '../context/ProgressContext';
 
 export default function HomeScreen() {
   const [duration, setDuration] = useState(15);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
+  const { progress, setProgress } = useContext(ProgressContext);
 
   const workoutData = [
     { name: 'Cycling', emoji: '🚴', caloriesPerMinute: 8 },
@@ -36,6 +40,50 @@ export default function HomeScreen() {
     ? selectedWorkout.caloriesPerMinute * duration
     : 0;
 
+  // Example calorie goal: 500 calories per day (can be dynamic or come from props/context)
+  const calorieGoal = 500;
+
+  const handleSaveWorkout = async () => {
+    if (!selectedWorkout) {
+      Alert.alert('Select workout', 'Please select a workout type first.');
+      return;
+    }
+
+    try {
+      // Load existing workouts
+      const stored = await AsyncStorage.getItem('workouts');
+      const workouts = stored ? JSON.parse(stored) : [];
+
+      const newWorkout = {
+        id: Date.now(),
+        type: selectedWorkout.name,
+        emoji: selectedWorkout.emoji,
+        duration,
+        caloriesBurned,
+        date: new Date().toISOString(),
+      };
+
+      workouts.push(newWorkout);
+      await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
+
+      // Update progress if caloriesBurned affects goal
+      if (caloriesBurned > 0) {
+        const newProgress = Math.min(100, ((progress / 100) * calorieGoal + caloriesBurned) / calorieGoal * 100);
+        setProgress(newProgress);
+      }
+
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      Alert.alert('Saved', 'Your workout was saved successfully!');
+
+      // Reset selection & duration optionally
+      setSelectedWorkout(null);
+      setDuration(15);
+    } catch (error) {
+      Alert.alert('Error', 'Failed to save workout.');
+      console.error(error);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Calculation of calories</Text>
@@ -47,7 +95,7 @@ export default function HomeScreen() {
       <Pressable
         style={styles.workoutBox}
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy); // vibration on open modal
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
           setModalVisible(true);
         }}
       >
@@ -84,7 +132,7 @@ export default function HomeScreen() {
             value={duration}
             onValueChange={(val) => {
               setDuration(Math.round(val));
-              Haptics.selectionAsync(); // vibration on slider change
+              Haptics.selectionAsync();
             }}
             minimumTrackTintColor="tomato"
             maximumTrackTintColor="#ccc"
@@ -93,6 +141,18 @@ export default function HomeScreen() {
           <Text style={styles.sliderEdgeLabel}>120 min</Text>
         </View>
       </View>
+
+      {/* Confirm Button */}
+      <Pressable
+        style={[
+          styles.saveButton,
+          !(selectedWorkout && duration) && styles.saveButtonDisabled,
+        ]}
+        disabled={!(selectedWorkout && duration)}
+        onPress={handleSaveWorkout}
+      >
+        <Text style={styles.saveButtonText}>Save Your Workout</Text>
+      </Pressable>
 
       {/* Modal for workout options */}
       <Modal visible={modalVisible} transparent animationType="slide">
@@ -106,7 +166,7 @@ export default function HomeScreen() {
                   key={item.name}
                   onPress={() => {
                     setSelectedWorkout(item);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium); // vibration on selection
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     setModalVisible(false);
                   }}
                   style={styles.modalWorkoutBox}
@@ -120,7 +180,7 @@ export default function HomeScreen() {
 
             <Pressable
               onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light); // vibration on cancel
+                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setModalVisible(false);
               }}
             >
@@ -166,11 +226,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'left',
   },
-  arrow: {
-    fontSize: 22,
-    color: '#555',
-    fontWeight: 'bold',
-  },
   sliderBox: {
     padding: 20,
     borderWidth: 1,
@@ -215,6 +270,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#777',
     textAlign: 'center',
+  },
+  saveButton: {
+    marginTop: 30,
+    backgroundColor: 'tomato',
+    paddingVertical: 15,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  saveButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
+  saveButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 16,
   },
   modalOverlay: {
     flex: 1,

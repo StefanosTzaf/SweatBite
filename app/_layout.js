@@ -3,6 +3,7 @@ import { useContext } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SnackStepContext, SnackStepProvider } from '../context/SnackStepContext';
+import { GoalsProvider } from '../context/GoalsContext';  // <-- import GoalsProvider αντί για ProgressProvider
 
 function LayoutContent() {
   const router = useRouter();
@@ -11,7 +12,6 @@ function LayoutContent() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        {/* Βελάκι μόνο αν step === 2 */}
         {step === 2 && (
           <Pressable
             onPress={() => setStep(1)}
@@ -75,9 +75,11 @@ function LayoutContent() {
 
 export default function Layout() {
   return (
-    <SnackStepProvider>
-      <LayoutContent />
-    </SnackStepProvider>
+    <GoalsProvider>
+      <SnackStepProvider>
+        <LayoutContent />
+      </SnackStepProvider>
+    </GoalsProvider>
   );
 }
 
@@ -91,10 +93,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center', // κεντράρει το title
+    justifyContent: 'center',
     borderBottomWidth: 1,
     borderBottomColor: '#eee',
-    position: 'relative', // για να τοποθετήσουμε το βελάκι απόλυτα
+    position: 'relative',
   },
   backButton: {
     position: 'absolute',

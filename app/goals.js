@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   Pressable,
+  ScrollView,
+  Alert,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { ProgressBar } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/Feather';
 
 const GOAL_TYPES = [
   {
@@ -28,6 +33,7 @@ const CALORIES_PERIODS = [
 ];
 
 export default function GoalsTab() {
+  const [goals, setGoals] = useState([]);
   const [showSetGoal, setShowSetGoal] = useState(false);
   const [step, setStep] = useState(1);
   const [selectedGoalType, setSelectedGoalType] = useState(null);
@@ -36,16 +42,27 @@ export default function GoalsTab() {
   const [snackStreak, setSnackStreak] = useState(5);
   const [workoutsPerWeek, setWorkoutsPerWeek] = useState(3);
 
+  useEffect(() => {
+    const loadGoals = async () => {
+      const savedGoals = await AsyncStorage.getItem('goals');
+      if (savedGoals) setGoals(JSON.parse(savedGoals));
+    };
+    loadGoals();
+  }, []);
+
+  const saveGoals = async (newGoals) => {
+    setGoals(newGoals);
+    await AsyncStorage.setItem('goals', JSON.stringify(newGoals));
+  };
+
   const handleAddGoalPress = () => {
     setShowSetGoal(true);
     setStep(1);
     setSelectedGoalType(null);
     setCaloriesPeriod(null);
     setCaloriesTarget(500);
-  };
-
-  const handleGoalTypeSelect = (type) => {
-    setSelectedGoalType(type);
+    setSnackStreak(5);
+    setWorkoutsPerWeek(3);
   };
 
   const handleSaveGoalType = () => {
@@ -62,25 +79,44 @@ export default function GoalsTab() {
     setStep(3);
   };
 
-  const handleSaveCaloriesTarget = () => {
-    alert(
-      `Saved: ${selectedGoalType} - ${caloriesPeriod} - ${caloriesTarget} calories`
-    );
+  const addGoal = async (goal) => {
+    const updatedGoals = [...goals, goal];
+    await saveGoals(updatedGoals);
     setShowSetGoal(false);
+  };
+
+  const handleSaveCaloriesTarget = () => {
+    addGoal({
+      type: 'Calories burned',
+      period: caloriesPeriod,
+      target: caloriesTarget,
+      progress: 0,
+    });
   };
 
   const handleSaveSnackStreak = () => {
-    alert(`Saved: ${selectedGoalType} - ${snackStreak} days`);
-    setShowSetGoal(false);
+    addGoal({
+      type: 'Healthy snack streak',
+      target: snackStreak,
+      progress: 0,
+    });
   };
 
   const handleSaveWorkoutsGoal = () => {
-    alert(`Saved: ${selectedGoalType} - ${workoutsPerWeek} workouts/week`);
-    setShowSetGoal(false);
+    addGoal({
+      type: 'Number of workouts per week',
+      target: workoutsPerWeek,
+      progress: 0,
+    });
   };
 
   const handleCancel = () => {
     setShowSetGoal(false);
+  };
+
+  const handleDeleteGoal = async (index) => {
+    const updatedGoals = goals.filter((_, i) => i !== index);
+    await saveGoals(updatedGoals);
   };
 
   const maxCalories = caloriesPeriod === 'Weekly' ? 10000 : 1500;
@@ -90,13 +126,50 @@ export default function GoalsTab() {
     return value.toString();
   };
 
+  const renderProgressCard = (goal, index) => {
+    const percentage = goal.progress / goal.target;
+    let label = '';
+    if (goal.type === 'Healthy snack streak') {
+      label = `${goal.progress} day streak`;
+    } else if (goal.type === 'Number of workouts per week') {
+      label = `${goal.progress} / ${goal.target} workouts done`;
+    } else {
+      label = `${goal.progress} / ${goal.target} calories burned`;
+    }
+
+    return (
+      <View key={index} style={styles.goalCard}>
+        <Text style={styles.goalTitle}>
+          {goal.type === 'Healthy snack streak'
+            ? `Complete a ${goal.target} day streak for healthy snacks`
+            : goal.type === 'Number of workouts per week'
+            ? `Do ${goal.target} workouts this week`
+            : `Burn ${goal.target} calories (${goal.period})`}
+        </Text>
+        <ProgressBar progress={percentage} color="green" style={styles.progressBar} />
+        <Text style={styles.goalSubtitle}>{label}</Text>
+        <Pressable onPress={() => handleDeleteGoal(index)} style={styles.trashIcon}>
+          <Icon name="trash-2" size={22} color="#900" />
+        </Pressable>
+      </View>
+    );
+  };
+
   return (
     <View style={styles.container}>
       {!showSetGoal ? (
         <>
-          <Text style={styles.title}>Goals</Text>
-          <Text style={styles.subtitle}>No goals yet :</Text>
-          <Text style={styles.subtitle}>Tap + to set your first goal</Text>
+          <Text style={styles.title}>Your current goals</Text>
+          {goals.length === 0 ? (
+            <>
+              <Text style={styles.subtitle}>No goals yet</Text>
+              <Text style={styles.subtitle}>Tap + to set your first goal</Text>
+            </>
+          ) : (
+            <ScrollView style={{ marginBottom: 80 }}>
+              {goals.map((goal, index) => renderProgressCard(goal, index))}
+            </ScrollView>
+          )}
 
           <Pressable style={styles.addButton} onPress={handleAddGoalPress}>
             <Text style={styles.addButtonText}>+</Text>
@@ -111,7 +184,7 @@ export default function GoalsTab() {
               <Pressable
                 key={label}
                 style={styles.radioOption}
-                onPress={() => handleGoalTypeSelect(label)}
+                onPress={() => setSelectedGoalType(label)}
               >
                 <View style={[styles.radioCircle, selected && styles.radioSelected]}>
                   {selected && <View style={styles.radioInnerCircle} />}
@@ -123,13 +196,8 @@ export default function GoalsTab() {
               </Pressable>
             );
           })}
-
           <View style={styles.buttonRow}>
-            <Pressable
-              style={[styles.button, !selectedGoalType && styles.buttonDisabled]}
-              disabled={!selectedGoalType}
-              onPress={handleSaveGoalType}
-            >
+            <Pressable style={[styles.button]} onPress={handleSaveGoalType}>
               <Text style={styles.buttonText}>Save</Text>
             </Pressable>
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
@@ -158,13 +226,8 @@ export default function GoalsTab() {
               </Pressable>
             );
           })}
-
           <View style={styles.buttonRow}>
-            <Pressable
-              style={[styles.button, !caloriesPeriod && styles.buttonDisabled]}
-              disabled={!caloriesPeriod}
-              onPress={handleSaveCaloriesPeriod}
-            >
+            <Pressable style={styles.button} onPress={handleSaveCaloriesPeriod}>
               <Text style={styles.buttonText}>Save</Text>
             </Pressable>
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
@@ -205,10 +268,6 @@ export default function GoalsTab() {
         <View style={styles.selectionContainer}>
           <Text style={styles.subSelectionTitle}>Set a streak for healthy snacks:</Text>
           <Text style={styles.caloriesDisplay}>{snackStreak} days</Text>
-          <View style={styles.sliderLabelsRow}>
-            <Text style={styles.sliderLabel}>0</Text>
-            <Text style={styles.sliderLabel}>30</Text>
-          </View>
           <Slider
             style={{ width: '100%', height: 40 }}
             minimumValue={0}
@@ -232,10 +291,6 @@ export default function GoalsTab() {
         <View style={styles.selectionContainer}>
           <Text style={styles.subSelectionTitle}>Set a number of workouts for this week:</Text>
           <Text style={styles.caloriesDisplay}>{workoutsPerWeek} workouts</Text>
-          <View style={styles.sliderLabelsRow}>
-            <Text style={styles.sliderLabel}>0</Text>
-            <Text style={styles.sliderLabel}>14</Text>
-          </View>
           <Slider
             style={{ width: '100%', height: 40 }}
             minimumValue={0}
@@ -265,35 +320,62 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#fdfdfd',
-    justifyContent: 'flex-start',
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     marginBottom: 20,
-    textAlign: 'left',
   },
   subtitle: {
-    fontSize: 21,
+    fontSize: 18,
     color: '#555',
     textAlign: 'center',
     marginBottom: 10,
   },
   addButton: {
     position: 'absolute',
-    bottom: 50,
+    bottom: 40,
     alignSelf: 'center',
     backgroundColor: 'green',
-    width: 80,
-    height: 80,
-    borderRadius: 40,
+    width: 70,
+    height: 70,
+    borderRadius: 35,
     justifyContent: 'center',
     alignItems: 'center',
-    elevation: 5,
+    elevation: 4,
   },
   addButtonText: {
-    fontSize: 50,
+    fontSize: 40,
     color: 'white',
+  },
+  goalCard: {
+    backgroundColor: '#e0fce6',
+    padding: 20,
+    marginBottom: 20,
+    borderRadius: 16,
+    position: 'relative',
+  },
+  goalTitle: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  goalSubtitle: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#444',
+    textAlign: 'center',
+  },
+  trashIcon: {
+    position: 'absolute',
+    bottom: 10,
+    right: 10,
+  },
+  progressBar: {
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: '#eee',
   },
   selectionContainer: {
     marginTop: 50,
@@ -367,9 +449,6 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: '#444',
-  },
-  buttonDisabled: {
-    backgroundColor: '#aaa',
   },
   caloriesDisplay: {
     fontSize: 18,
