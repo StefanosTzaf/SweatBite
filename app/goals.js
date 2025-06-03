@@ -5,7 +5,6 @@ import {
   StyleSheet,
   Pressable,
   ScrollView,
-  Alert,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,10 +15,6 @@ const GOAL_TYPES = [
   {
     label: 'Calories burned',
     description: 'Set a target to hit weekly or daily',
-  },
-  {
-    label: 'Healthy snack streak',
-    description: 'Track how often you choose healthy snacks',
   },
   {
     label: 'Number of workouts per week',
@@ -39,7 +34,6 @@ export default function GoalsTab() {
   const [selectedGoalType, setSelectedGoalType] = useState(null);
   const [caloriesPeriod, setCaloriesPeriod] = useState(null);
   const [caloriesTarget, setCaloriesTarget] = useState(500);
-  const [snackStreak, setSnackStreak] = useState(5);
   const [workoutsPerWeek, setWorkoutsPerWeek] = useState(3);
 
   useEffect(() => {
@@ -61,7 +55,6 @@ export default function GoalsTab() {
     setSelectedGoalType(null);
     setCaloriesPeriod(null);
     setCaloriesTarget(500);
-    setSnackStreak(5);
     setWorkoutsPerWeek(3);
   };
 
@@ -94,14 +87,6 @@ export default function GoalsTab() {
     });
   };
 
-  const handleSaveSnackStreak = () => {
-    addGoal({
-      type: 'Healthy snack streak',
-      target: snackStreak,
-      progress: 0,
-    });
-  };
-
   const handleSaveWorkoutsGoal = () => {
     addGoal({
       type: 'Number of workouts per week',
@@ -129,9 +114,7 @@ export default function GoalsTab() {
   const renderProgressCard = (goal, index) => {
     const percentage = goal.progress / goal.target;
     let label = '';
-    if (goal.type === 'Healthy snack streak') {
-      label = `${goal.progress} day streak`;
-    } else if (goal.type === 'Number of workouts per week') {
+    if (goal.type === 'Number of workouts per week') {
       label = `${goal.progress} / ${goal.target} workouts done`;
     } else {
       label = `${goal.progress} / ${goal.target} calories burned`;
@@ -140,9 +123,7 @@ export default function GoalsTab() {
     return (
       <View key={index} style={styles.goalCard}>
         <Text style={styles.goalTitle}>
-          {goal.type === 'Healthy snack streak'
-            ? `Complete a ${goal.target} day streak for healthy snacks`
-            : goal.type === 'Number of workouts per week'
+          {goal.type === 'Number of workouts per week'
             ? `Do ${goal.target} workouts this week`
             : `Burn ${goal.target} calories (${goal.period})`}
         </Text>
@@ -264,29 +245,6 @@ export default function GoalsTab() {
             </Pressable>
           </View>
         </View>
-      ) : step === 3 && selectedGoalType === 'Healthy snack streak' ? (
-        <View style={styles.selectionContainer}>
-          <Text style={styles.subSelectionTitle}>Set a streak for healthy snacks:</Text>
-          <Text style={styles.caloriesDisplay}>{snackStreak} days</Text>
-          <Slider
-            style={{ width: '100%', height: 40 }}
-            minimumValue={0}
-            maximumValue={30}
-            step={1}
-            value={snackStreak}
-            onValueChange={setSnackStreak}
-            minimumTrackTintColor="green"
-            maximumTrackTintColor="#ddd"
-          />
-          <View style={styles.buttonRow}>
-            <Pressable style={styles.button} onPress={handleSaveSnackStreak}>
-              <Text style={styles.buttonText}>Save</Text>
-            </Pressable>
-            <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
-              <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
-            </Pressable>
-          </View>
-        </View>
       ) : step === 3 && selectedGoalType === 'Number of workouts per week' ? (
         <View style={styles.selectionContainer}>
           <Text style={styles.subSelectionTitle}>Set a number of workouts for this week:</Text>
@@ -379,7 +337,7 @@ const styles = StyleSheet.create({
   },
   selectionContainer: {
     marginTop: 50,
-    backgroundColor: '#e7f1ff',
+    backgroundColor: '#e6f4ea',
     padding: 20,
     borderRadius: 12,
   },
