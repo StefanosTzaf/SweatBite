@@ -1,42 +1,80 @@
-import { useContext, useState } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useContext, useState, useEffect } from 'react';
+import { Modal, Pressable, StyleSheet, Text, View, Alert } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { SnackStepContext } from '../context/SnackStepContext';
+import { snacks } from '../data/SnackSuggestions.js'; 
 
 export default function SnackSuggestionTab() {
   const { step, setStep } = useContext(SnackStepContext);
 
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedIntensity, setSelectedIntensity] = useState(null);
+  const [selectedWorkout, setSelectedWorkout] = useState(null);
   const [showPreModal, setShowPreModal] = useState(false);
   const [showAfterModal, setShowAfterModal] = useState(false);
-  const [selectedAfterOption, setSelectedAfterOption] = useState(null);
+  const [recentWorkouts, setRecentWorkouts] = useState([]);
 
   const handleFirstConfirm = () => {
     if (selectedOption === 'Pre workout') {
       setShowPreModal(true);
     } else if (selectedOption === 'After workout') {
+      fetchRecentWorkouts();
       setShowAfterModal(true);
     }
   };
 
+  const fetchRecentWorkouts = async () => {
+    try {
+      const stored = await AsyncStorage.getItem('workouts');
+      const parsed = stored ? JSON.parse(stored) : [];
+      setRecentWorkouts(parsed.reverse().slice(0, 3));
+    } catch (err) {
+      Alert.alert('Error', 'Failed to load workouts');
+      console.error(err);
+    }
+  };
+
+  const getPreWorkoutSnacksByIntensity = (intensity) => {
+    if (!intensity) return [];
+
+    if (intensity === 'Low') {
+      return snacks.filter(s => s.calories <= 150).slice(0, 5);
+    } else if (intensity === 'Medium') {
+      return snacks.filter(s => s.calories > 150 && s.calories <= 220).slice(0, 5);
+    } else if (intensity === 'High') {
+      return snacks.filter(s => s.calories > 220).slice(0, 5);
+    }
+
+    return [];
+  };
+
   const handleShowSnacks = () => {
-    alert(`Confirmed: ${selectedOption} - Intensity: ${selectedIntensity || selectedAfterOption}`);
+    let message = '';
+
+    if (selectedOption === 'After workout' && selectedWorkout) {
+      message = `After workout: ${selectedWorkout.type} | 🔥 ${selectedWorkout.caloriesBurned} kcal`;
+      // μπορείς να προσθέσεις αντίστοιχο φίλτρο εδώ
+    } else if (selectedOption === 'Pre workout' && selectedIntensity) {
+      const suggested = getPreWorkoutSnacksByIntensity(selectedIntensity);
+      message = `Pre workout | Intensity: ${selectedIntensity}\n\nSuggested Snacks:\n` +
+        suggested.map(s => `${s.emoji} ${s.name} - ${s.calories} kcal`).join('\n');
+    }
+
+    Alert.alert('Snack Suggestions', message);
+
     setShowPreModal(false);
     setShowAfterModal(false);
-    setStep(1); // Reset or advance as needed
+    setStep(1);
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Snack suggestion</Text>
 
-       <View style={styles.optionGroupCard}>
+      <View style={styles.optionGroupCard}>
         <Text style={styles.subtitle}>Select a snack for:</Text>
 
-        <Pressable
-          style={styles.radioButtonContainer}
-          onPress={() => setSelectedOption('Pre workout')}
-        >
+        <Pressable style={styles.radioButtonContainer} onPress={() => setSelectedOption('Pre workout')}>
           <View style={styles.radioButtonOuter}>
             {selectedOption === 'Pre workout' && <View style={styles.radioButtonInner} />}
           </View>
@@ -46,10 +84,7 @@ export default function SnackSuggestionTab() {
           </View>
         </Pressable>
 
-        <Pressable
-          style={styles.radioButtonContainer}
-          onPress={() => setSelectedOption('After workout')}
-        >
+        <Pressable style={styles.radioButtonContainer} onPress={() => setSelectedOption('After workout')}>
           <View style={styles.radioButtonOuter}>
             {selectedOption === 'After workout' && <View style={styles.radioButtonInner} />}
           </View>
@@ -111,22 +146,27 @@ export default function SnackSuggestionTab() {
       <Modal visible={showAfterModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Select an after-workout snack for:</Text>
-            {[
-              { label: 'Choose from previous workouts' },
-              { label: 'Show me random snacks' },
-            ].map(item => (
-              <Pressable
-                key={item.label}
-                style={styles.radioButtonContainer}
-                onPress={() => setSelectedAfterOption(item.label)}
-              >
-                <View style={styles.radioButtonOuter}>
-                  {selectedAfterOption === item.label && <View style={styles.radioButtonInner} />}
-                </View>
-                <Text style={styles.radioLabel}>{item.label}</Text>
-              </Pressable>
-            ))}
+            <Text style={styles.modalTitle}>Select one of your last 3 workouts</Text>
+            {recentWorkouts.length === 0 ? (
+              <Text>No recent workouts found.</Text>
+            ) : (
+              recentWorkouts.map((workout, index) => (
+                <Pressable
+                  key={index}
+                  style={[
+                    styles.workoutItem,
+                    selectedWorkout?.id === workout.id && styles.workoutItemSelected,
+                  ]}
+                  onPress={() => setSelectedWorkout(workout)}
+                >
+                  <Text style={styles.workoutText}>{workout.emoji} {workout.type}</Text>
+                  <Text style={styles.workoutDetails}>
+                    Duration: {workout.duration} mins | 🔥 {workout.caloriesBurned} kcal
+                  </Text>
+                  <Text style={styles.workoutDate}>🕒 {new Date(workout.date).toLocaleString()}</Text>
+                </Pressable>
+              ))
+            )}
 
             <View style={styles.modalActions}>
               <Pressable style={styles.cancelButton} onPress={() => setShowAfterModal(false)}>
@@ -135,7 +175,7 @@ export default function SnackSuggestionTab() {
               <Pressable
                 style={[styles.confirmButton, { marginLeft: 10 }]}
                 onPress={handleShowSnacks}
-                disabled={!selectedAfterOption}
+                disabled={!selectedWorkout}
               >
                 <Text style={styles.confirmButtonText}>Show Snacks</Text>
               </Pressable>
@@ -146,6 +186,7 @@ export default function SnackSuggestionTab() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fdfdfd' },
@@ -240,5 +281,30 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginTop: 20,
+  },
+
+  workoutItem: {
+    backgroundColor: '#e6f4ea',
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+  workoutItemSelected: {
+    borderColor: 'green',
+    borderWidth: 2,
+  },
+  workoutText: {
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  workoutDetails: {
+    fontSize: 14,
+    color: '#333',
+    marginTop: 4,
+  },
+  workoutDate: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 2,
   },
 });
