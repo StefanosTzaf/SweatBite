@@ -14,14 +14,14 @@ import {
 import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProgressContext } from '../context/ProgressContext';
-import { GoalsContext } from '../context/GoalsContext'; // Import GoalsContext
+import { GoalsContext } from '../context/GoalsContext';
 
 export default function HomeScreen() {
   const [duration, setDuration] = useState(15);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const { progress, setProgress } = useContext(ProgressContext);
-  const { goals, updateGoalProgress } = useContext(GoalsContext); // Use GoalsContext
+  const { goals, updateGoalProgress } = useContext(GoalsContext);
 
   const workoutData = [
     { name: 'Cycling', emoji: '🚴', caloriesPerMinute: 8 },
@@ -49,7 +49,6 @@ export default function HomeScreen() {
     }
 
     try {
-      // Load existing workouts
       const stored = await AsyncStorage.getItem('workouts');
       const workouts = stored ? JSON.parse(stored) : [];
 
@@ -65,24 +64,20 @@ export default function HomeScreen() {
       workouts.push(newWorkout);
       await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
 
-      // Update progress for calorie-related goals
       goals
         .filter((goal) => goal.type === 'Calories burned')
         .forEach((goal) => {
           updateGoalProgress('Calories burned', goal.period, caloriesBurned);
         });
 
-      // Update progress for workout-related goals
       goals
         .filter((goal) => goal.type === 'Number of workouts per week')
         .forEach((goal) => {
-          updateGoalProgress('Number of workouts per week', goal.period, 1); // Increment by 1 workout
+          updateGoalProgress('Number of workouts per week', goal.period, 1);
         });
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Saved', 'Your workout was saved successfully!');
-
-      // Reset selection & duration optionally
       setSelectedWorkout(null);
       setDuration(15);
     } catch (error) {
@@ -98,7 +93,6 @@ export default function HomeScreen() {
         Estimate how many calories you burned during your workout.
       </Text>
 
-      {/* Workout Selection Button */}
       <Pressable
         style={styles.workoutBox}
         onPress={() => {
@@ -114,7 +108,6 @@ export default function HomeScreen() {
         <MaterialIcons name="chevron-right" size={24} color="#555" />
       </Pressable>
 
-      {/* Duration Slider */}
       <View style={styles.sliderBox}>
         <Text style={styles.label}>⏱ Duration</Text>
         <Text style={styles.note}>
@@ -149,7 +142,6 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Confirm Button */}
       <Pressable
         style={[
           styles.saveButton,
@@ -161,7 +153,10 @@ export default function HomeScreen() {
         <Text style={styles.saveButtonText}>Save Your Workout</Text>
       </Pressable>
 
-      {/* Modal for workout options */}
+      <Text style={styles.saveNote}>
+        for personalized snacks and more accurate goals
+      </Text>
+
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.fullWidthModal}>
@@ -196,6 +191,14 @@ export default function HomeScreen() {
           </View>
         </View>
       </Modal>
+
+      {/* Plain snack message at bottom */}
+      {selectedWorkout && (
+        <Text style={styles.snackMessage}>
+          Want to refuel?{' '}
+          <Text style={styles.snackLink}>Check the Snacks tab</Text> for healthy options.
+        </Text>
+      )}
     </View>
   );
 }
@@ -223,7 +226,7 @@ const styles = StyleSheet.create({
     borderColor: '#ddd',
     borderRadius: 12,
     backgroundColor: '#e6f4ea',
-    marginBottom: 30,
+    marginBottom: 10,
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
@@ -248,7 +251,6 @@ const styles = StyleSheet.create({
   note: {
     fontSize: 12,
     color: '#888',
-    textAlign: 'left',
     marginBottom: 4,
   },
   durationText: {
@@ -293,6 +295,13 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontSize: 16,
   },
+  saveNote: {
+    marginTop: 8,
+    fontSize: 13,
+    color: '#666',
+    textAlign: 'center',
+    fontStyle: 'italic',
+  },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
@@ -325,5 +334,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'tomato',
     fontWeight: 'bold',
+  },
+
+  snackMessage: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    fontSize: 14,
+    color: '#2e7d32',
+    textAlign: 'center',
+  },
+  snackLink: {
+    fontWeight: '700',
+    color: '#2e7d32',
   },
 });
