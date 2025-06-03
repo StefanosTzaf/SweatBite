@@ -10,7 +10,6 @@ export const snacks = [
   { name: "Carrot sticks with hummus", calories: 120, emoji: "🥕🧆", description: "Fiber + plant protein" },
   { name: "Cottage cheese with pineapple", calories: 180, emoji: "🍍🧀", description: "Protein + vitamin C" },
   { name: "Mixed nuts (handful)", calories: 190, emoji: "🥜🌰", description: "Healthy fats + protein" },
-
   { name: "Chia pudding with almond milk", calories: 230, emoji: "🍮🥥", description: "Omega-3 + fiber" },
   { name: "Edamame pods", calories: 150, emoji: "🌱🟢", description: "Plant protein + fiber" },
   { name: "Turkey slices with cheese", calories: 170, emoji: "🦃🧀", description: "Lean protein + fat" },
@@ -21,7 +20,6 @@ export const snacks = [
   { name: "Cucumber and turkey roll-ups", calories: 130, emoji: "🥒🦃", description: "Low calorie + protein" },
   { name: "Hard cheese cubes", calories: 160, emoji: "🧀", description: "Protein + fat" },
   { name: "Apple with string cheese", calories: 150, emoji: "🍎🧀", description: "Fiber + protein" },
-
   { name: "Rice pudding with cinnamon", calories: 210, emoji: "🍚🍮", description: "Carbs + comfort snack" },
   { name: "Beef jerky", calories: 140, emoji: "🥩", description: "High protein + low fat" },
   { name: "Almonds (handful)", calories: 160, emoji: "🌰", description: "Healthy fats + protein" },
@@ -32,7 +30,6 @@ export const snacks = [
   { name: "Oat bar with raisins", calories: 220, emoji: "🍫🍇", description: "Carbs + iron" },
   { name: "Celery sticks with peanut butter", calories: 140, emoji: "🥒🥜", description: "Fiber + fats" },
   { name: "Canned tuna on whole wheat cracker", calories: 180, emoji: "🐟🍘", description: "Protein + carbs" },
-
   { name: "Protein pancake with berries", calories: 280, emoji: "🥞🍓", description: "Protein + antioxidants" },
   { name: "Green smoothie with kale", calories: 210, emoji: "🥬🥤", description: "Vitamins + fiber" },
   { name: "Banana oatmeal cookies", calories: 190, emoji: "🍪🍌", description: "Carbs + fiber" },
@@ -43,7 +40,6 @@ export const snacks = [
   { name: "Dates stuffed with almond butter", calories: 200, emoji: "🌴🥜", description: "Natural sugars + fats" },
   { name: "Baked kale chips", calories: 110, emoji: "🥬🍃", description: "Low cal + antioxidants" },
   { name: "Protein bar (low sugar)", calories: 210, emoji: "🍫💪", description: "High protein + low sugar" },
-
   { name: "Watermelon slices", calories: 50, emoji: "🍉", description: "Hydrating + low calorie" },
   { name: "Dark chocolate (20g)", calories: 120, emoji: "🍫", description: "Antioxidants + mood boost" },
   { name: "Boiled shrimp", calories: 90, emoji: "🦐", description: "Lean protein" },
@@ -64,7 +60,6 @@ export const snacks = [
   { name: "Protein granola bar", calories: 200, emoji: "🍫💪", description: "High protein + energy" },
   { name: "Sweet potato with cinnamon", calories: 180, emoji: "🍠🍂", description: "Complex carbs + antioxidants" },
   { name: "Rice cakes with cottage cheese", calories: 160, emoji: "🍚🧀", description: "Light carbs + protein" },
-
   { name: "Boiled edamame with sea salt", calories: 160, emoji: "🌱🧂", description: "Plant protein + minerals" },
   { name: "Mixed berries with Greek yogurt", calories: 190, emoji: "🍓🫐🍶", description: "Antioxidants + protein" },
   { name: "Celery with cream cheese", calories: 130, emoji: "🥒🧀", description: "Low cal + protein" },
@@ -75,7 +70,6 @@ export const snacks = [
   { name: "Dates with walnuts", calories: 210, emoji: "🌴🌰", description: "Natural sugars + healthy fats" },
   { name: "Almond butter on whole wheat toast", calories: 220, emoji: "🥜🍞", description: "Healthy fats + carbs" },
   { name: "Cottage cheese with peach slices", calories: 160, emoji: "🧀🍑", description: "Protein + vitamins" },
-
   { name: "Spinach and feta omelette", calories: 230, emoji: "🥚🥬🧀", description: "Protein + iron + fat" },
   { name: "Trail mix with dried apricots", calories: 260, emoji: "🥜🍑", description: "Energy dense + micronutrients" },
   { name: "Chia seed smoothie bowl", calories: 250, emoji: "🍮🥥🍓", description: "Omega-3 + fiber + antioxidants" },
@@ -86,7 +80,6 @@ export const snacks = [
   { name: "Boiled eggs with hot sauce", calories: 140, emoji: "🥚🌶️", description: "Protein + metabolism boost" },
   { name: "Apple with cheddar cheese", calories: 170, emoji: "🍎🧀", description: "Fiber + protein" },
   { name: "Pumpkin seed trail mix", calories: 230, emoji: "🎃🥜", description: "Magnesium + healthy fats" },
-
   { name: "Protein shake with spinach", calories: 210, emoji: "🥤🥬", description: "Protein + vitamins" },
   { name: "Peanut butter on celery sticks", calories: 140, emoji: "🥒🥜", description: "Fiber + fats" },
   { name: "Cottage cheese with tomatoes", calories: 140, emoji: "🧀🍅", description: "Protein + antioxidants" },
@@ -97,7 +90,6 @@ export const snacks = [
   { name: "Berry and spinach smoothie", calories: 200, emoji: "🍓🥬🥤", description: "Antioxidants + vitamins" },
   { name: "Baked kale chips", calories: 110, emoji: "🥬🍃", description: "Low cal + antioxidants" },
   { name: "Chocolate protein pancakes", calories: 280, emoji: "🥞🍫", description: "Protein + energy" },
-
   { name: "Watermelon and feta salad", calories: 120, emoji: "🍉🧀", description: "Hydrating + protein" },
   { name: "Dark chocolate (30g)", calories: 180, emoji: "🍫", description: "Antioxidants + mood boost" },
   { name: "Boiled shrimp with lemon", calories: 90, emoji: "🦐🍋", description: "Lean protein + vitamin C" },
@@ -108,7 +100,6 @@ export const snacks = [
   { name: "Cucumber and cream cheese bites", calories: 130, emoji: "🥒🧀", description: "Light + protein" },
   { name: "Granola with nuts and yogurt", calories: 240, emoji: "🥣🥜🍶", description: "Carbs + protein + fats" },
   { name: "Rice and lentil bowl", calories: 260, emoji: "🍚🍲", description: "Complete protein + fiber" },
-  
   { name: "Oatmeal with banana and cinnamon", calories: 220, emoji: "🥣🍌🍂", description: "Complex carbs + potassium" },
   { name: "Almond butter and jelly sandwich", calories: 310, emoji: "🥪🥜🍓", description: "Carbs + protein + fats" },
   { name: "Greek yogurt with chia seeds", calories: 190, emoji: "🍶🍮", description: "Protein + omega-3" },

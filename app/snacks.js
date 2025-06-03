@@ -1,8 +1,16 @@
-import { useContext, useState, useEffect } from 'react';
-import { Modal, Pressable, StyleSheet, Text, View, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useContext, useState } from 'react';
+import {
+  Alert,
+  Modal,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 import { SnackStepContext } from '../context/SnackStepContext';
-import { snacks } from '../data/SnackSuggestions.js'; 
+import { snacks } from '../data/SnackSuggestions.js';
 
 export default function SnackSuggestionTab() {
   const { step, setStep } = useContext(SnackStepContext);
@@ -13,6 +21,8 @@ export default function SnackSuggestionTab() {
   const [showPreModal, setShowPreModal] = useState(false);
   const [showAfterModal, setShowAfterModal] = useState(false);
   const [recentWorkouts, setRecentWorkouts] = useState([]);
+  const [view, setView] = useState('selection'); // 'selection' | 'snackList'
+  const [suggestedSnacks, setSuggestedSnacks] = useState([]);
 
   const handleFirstConfirm = () => {
     if (selectedOption === 'Pre workout') {
@@ -36,7 +46,6 @@ export default function SnackSuggestionTab() {
 
   const getPreWorkoutSnacksByIntensity = (intensity) => {
     if (!intensity) return [];
-
     if (intensity === 'Low') {
       return snacks.filter(s => s.calories <= 150).slice(0, 5);
     } else if (intensity === 'Medium') {
@@ -44,29 +53,85 @@ export default function SnackSuggestionTab() {
     } else if (intensity === 'High') {
       return snacks.filter(s => s.calories > 220).slice(0, 5);
     }
-
     return [];
   };
 
   const handleShowSnacks = () => {
-    let message = '';
+    let suggested = [];
 
     if (selectedOption === 'After workout' && selectedWorkout) {
-      message = `After workout: ${selectedWorkout.type} | 🔥 ${selectedWorkout.caloriesBurned} kcal`;
-      // μπορείς να προσθέσεις αντίστοιχο φίλτρο εδώ
+      // Basic filter: more calories burned = higher-calorie snacks
+      if (selectedWorkout.caloriesBurned > 400) {
+        suggested = snacks.filter(s => s.calories > 200).slice(0, 5);
+      } else {
+        suggested = snacks.filter(s => s.calories <= 200).slice(0, 5);
+      }
     } else if (selectedOption === 'Pre workout' && selectedIntensity) {
-      const suggested = getPreWorkoutSnacksByIntensity(selectedIntensity);
-      message = `Pre workout | Intensity: ${selectedIntensity}\n\nSuggested Snacks:\n` +
-        suggested.map(s => `${s.emoji} ${s.name} - ${s.calories} kcal`).join('\n');
+      suggested = getPreWorkoutSnacksByIntensity(selectedIntensity);
     }
 
-    Alert.alert('Snack Suggestions', message);
-
+    setSuggestedSnacks(suggested);
     setShowPreModal(false);
     setShowAfterModal(false);
+    setView('snackList');
+  };
+
+  const handleBack = () => {
+    setSelectedOption(null);
+    setSelectedIntensity(null);
+    setSelectedWorkout(null);
+    setSuggestedSnacks([]);
+    setView('selection');
     setStep(1);
   };
 
+  // -----------------
+  // Snack List View (Pre or After workout)
+  // -----------------
+  if (view === 'snackList') {
+    // Determine if it's pre or after workout
+    const isPre = selectedOption === 'Pre workout';
+
+    // For pre-workout: show intensity
+    // For after-workout: show workout summary
+    let snackListTitle = isPre ? 'Pre-workout snacks' : 'After-workout snacks';
+    let snackListDescription = '';
+    if (isPre) {
+      snackListDescription = selectedIntensity
+        ? `${selectedIntensity} intensity`
+        : '';
+    } else if (selectedWorkout) {
+      snackListDescription = `${selectedWorkout.emoji} ${selectedWorkout.type} — ${selectedWorkout.duration} min, 🔥 ${selectedWorkout.caloriesBurned} kcal`;
+    }
+
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>{snackListTitle}</Text>
+        {snackListDescription ? (
+          <Text style={styles.subtitle}>{snackListDescription}</Text>
+        ) : null}
+        <ScrollView>
+          {suggestedSnacks.map((snack, index) => (
+            <View key={index} style={styles.snackCard}>
+              <Text style={styles.snackEmoji}>{snack.emoji}</Text>
+              <View style={styles.snackContent}>
+                <Text style={styles.snackTitle}>{snack.name}</Text>
+                <Text style={styles.snackDetails}>{snack.calories} kcal</Text>
+                <Text style={styles.snackDescription}>{snack.description}</Text>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+        <Pressable style={styles.confirmButton} onPress={handleBack}>
+          <Text style={styles.confirmButtonText}>Back</Text>
+        </Pressable>
+      </View>
+    );
+  }
+
+  // -----------------
+  // Default Selection Screen
+  // -----------------
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Snack suggestion</Text>
@@ -187,10 +252,9 @@ export default function SnackSuggestionTab() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#fdfdfd' },
-  title: { fontWeight: 'bold', fontSize: 24, marginBottom: 40, color: 'black' },
+  title: { fontWeight: 'bold', fontSize: 24, marginBottom: 30, color: 'black' },
   subtitle: { fontSize: 18, marginBottom: 40, color: '#555' },
 
   optionGroupCard: {
@@ -199,10 +263,6 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 12,
     backgroundColor: '#e6f4ea',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 4,
     elevation: 2,
     marginBottom: 30,
   },
@@ -238,11 +298,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 30,
     paddingVertical: 14,
     borderRadius: 30,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
     marginTop: 20,
   },
   cancelButton: {
@@ -251,11 +306,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25,
     paddingVertical: 14,
     borderRadius: 30,
-    elevation: 4,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.3,
-    shadowRadius: 3,
     marginTop: 20,
   },
   confirmButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
@@ -306,5 +356,37 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     marginTop: 2,
+  },
+
+  snackCard: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderColor: '#cfcfcf',
+    borderWidth: 1,
+    elevation: 2,
+  },
+  snackEmoji: {
+    fontSize: 32,
+    marginRight: 16,
+  },
+  snackContent: {
+    flex: 1,
+  },
+  snackTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  snackDetails: {
+    fontSize: 14,
+    color: 'tomato',
+    marginBottom: 6,
+  },
+  snackDescription: {
+    fontSize: 13,
+    color: '#666',
   },
 });
