@@ -4,7 +4,6 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { SnackStepContext, SnackStepProvider } from '../context/SnackStepContext';
 import { GoalsProvider } from '../context/GoalsContext';
-import { ProgressProvider } from '../context/ProgressContext'; // <-- προσθήκη
 
 function LayoutContent() {
   const router = useRouter();
