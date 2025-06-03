@@ -10,6 +10,7 @@ import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProgressBar } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
+import { GoalsContext } from '../context/GoalsContext';
 
 const GOAL_TYPES = [
   {
@@ -427,3 +428,4 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
 });
+
