@@ -62,17 +62,8 @@ export default function HomeScreen() {
       workouts.push(newWorkout);
       await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
 
-      goals
-        .filter((goal) => goal.type === 'Calories burned')
-        .forEach((goal) => {
-          updateGoalProgress('Calories burned', goal.period, caloriesBurned);
-        });
-
-      goals
-        .filter((goal) => goal.type === 'Number of workouts per week')
-        .forEach((goal) => {
-          updateGoalProgress('Number of workouts per week', goal.period, 1);
-        });
+      await updateGoalProgress('Calories burned', undefined, caloriesBurned);
+      await updateGoalProgress('Number of workouts per week', undefined, 1);
 
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Saved', 'Your workout was saved successfully!');

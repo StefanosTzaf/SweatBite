@@ -18,37 +18,26 @@ export function GoalsProvider({ children }) {
     loadGoals();
   }, []);
 
-  // Update progress for a specific goal
+  const updateGoalProgress = async (type, period, valueToAdd) => {
+    const savedGoals = await AsyncStorage.getItem('goals');
+    const currentGoals = savedGoals ? JSON.parse(savedGoals) : goals;
 
-  // type: Calories burned or number of workouts
-  // period: daily, weekly or undefined
-  // valueToAdd: the amount to add to the current progress
-  const updateGoalProgress = async(type, period, valueToAdd) => {
     let updated = false;
-    const updatedGoals = goals.map((goal) => {
-      //if the period is undefined, it matches all periods
-      if (goal.type.tolowerCase() === type.tolowerCase && (!period || goal.period.tolowerCase() === period.tolowerCase())) {
-        
-        updated = true; 
-        
-        // the new progress is the sum of the current progress and the value to add
-        // goal.progress || 0 ensures that if progress is undefined, it starts from 0
+    const updatedGoals = currentGoals.map((goal) => {
+      if (
+        goal.type &&
+        goal.type.toLowerCase() === type.toLowerCase() &&
+        (!period || (goal.period && goal.period.toLowerCase() === period.toLowerCase()))
+      ) {
+        updated = true;
         const newProgress = (goal.progress || 0) + valueToAdd;
-       
         return { ...goal, progress: newProgress };
       }
-
-      // if the goal doesn't match, return it unchanged
       return goal;
     });
 
-    // if at least one goal was updated
     if (updated) {
-
-      //replace old list of goals with the new one
       setGoals(updatedGoals);
-
-      // save the list to the device's storage
       await AsyncStorage.setItem('goals', JSON.stringify(updatedGoals));
     }
   };

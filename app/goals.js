@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import {
   View,
   Text,
@@ -29,7 +29,7 @@ const CALORIES_PERIODS = [
 ];
 
 export default function GoalsTab() {
-  const [goals, setGoals] = useState([]);
+  const { goals, setGoals } = useContext(GoalsContext);
   const [showSetGoal, setShowSetGoal] = useState(false);
   const [step, setStep] = useState(1);
   const [selectedGoalType, setSelectedGoalType] = useState(null);
