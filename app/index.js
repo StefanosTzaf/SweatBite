@@ -13,14 +13,12 @@ import {
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ProgressContext } from '../context/ProgressContext';
 import { GoalsContext } from '../context/GoalsContext';
 
 export default function HomeScreen() {
   const [duration, setDuration] = useState(15);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
-  const { progress, setProgress } = useContext(ProgressContext);
   const { goals, updateGoalProgress } = useContext(GoalsContext);
 
   const workoutData = [

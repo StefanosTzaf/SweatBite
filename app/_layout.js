@@ -76,13 +76,11 @@ function LayoutContent() {
 
 export default function Layout() {
   return (
-    <ProgressProvider>
       <GoalsProvider>
         <SnackStepProvider>
           <LayoutContent />
         </SnackStepProvider>
       </GoalsProvider>
-    </ProgressProvider>
   );
 }
 
