@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "SweatBite2",
-    "slug": "SweatBite2",
+    "name": "SweatBite",
+    "slug": "SweatBite",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "sweatbite2",
+    "scheme": "sweatbite",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
