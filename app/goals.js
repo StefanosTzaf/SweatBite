@@ -1,13 +1,13 @@
-import React, { useEffect, useState, useContext } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import Slider from '@react-native-community/slider';
+import { useContext, useEffect, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
   Pressable,
   ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from 'react-native';
-import Slider from '@react-native-community/slider';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ProgressBar } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/Feather';
 import { GoalsContext } from '../context/GoalsContext';
@@ -113,27 +113,48 @@ export default function GoalsTab() {
   };
 
   const renderProgressCard = (goal, index) => {
-    // Prevent division by zero or undefined
+    // Clamp percentage to 1 (100%) and check if completed
     const percentage =
       typeof goal.target === 'number' && goal.target > 0
-        ? goal.progress / goal.target
+        ? Math.min(goal.progress / goal.target, 1)
         : 0;
+    const isCompleted = goal.progress >= goal.target;
+
     let label = '';
-    if (goal.type === 'Number of workouts per week') {
+    if (isCompleted) {
+      label = '🎉 Completed!';
+    } else if (goal.type === 'Number of workouts per week') {
       label = `${goal.progress} / ${goal.target} workouts done`;
     } else {
       label = `${goal.progress} / ${goal.target} calories burned`;
     }
 
     return (
-      <View key={index} style={styles.goalCard}>
+      <View
+        key={index}
+        style={[
+          styles.goalCard,
+          isCompleted && { opacity: 0.6, borderColor: 'green', borderWidth: 2 },
+        ]}
+      >
         <Text style={styles.goalTitle}>
           {goal.type === 'Number of workouts per week'
             ? `Do ${goal.target} workouts this week`
             : `Burn ${goal.target} calories (${goal.period})`}
         </Text>
-        <ProgressBar progress={percentage} color="green" style={styles.progressBar} />
-        <Text style={styles.goalSubtitle}>{label}</Text>
+        <ProgressBar
+          progress={percentage}
+          color={isCompleted ? 'gray' : 'green'}
+          style={styles.progressBar}
+        />
+        <Text
+          style={[
+            styles.goalSubtitle,
+            isCompleted && { color: 'green', fontWeight: 'bold' },
+          ]}
+        >
+          {label}
+        </Text>
         <Pressable onPress={() => handleDeleteGoal(index)} style={styles.trashIcon}>
           <Icon name="trash-2" size={22} color="#900" />
         </Pressable>

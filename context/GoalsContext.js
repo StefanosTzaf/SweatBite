@@ -29,8 +29,12 @@ export function GoalsProvider({ children }) {
         goal.type.toLowerCase() === type.toLowerCase() &&
         (!period || (goal.period && goal.period.toLowerCase() === period.toLowerCase()))
       ) {
+        // Stop progressing if goal is already completed
+        if (goal.progress >= goal.target) {
+          return goal;
+        }
         updated = true;
-        const newProgress = (goal.progress || 0) + valueToAdd;
+        const newProgress = Math.min((goal.progress || 0) + valueToAdd, goal.target);
         return { ...goal, progress: newProgress };
       }
       return goal;
