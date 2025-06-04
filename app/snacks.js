@@ -62,11 +62,17 @@ export default function SnackSuggestionTab() {
 
     if (selectedOption === 'After workout' && selectedWorkout) {
       // Basic filter: more calories burned = higher-calorie snacks
+      let filteredSnacks;
       if (selectedWorkout.caloriesBurned > 400) {
-        suggested = snacks.filter(s => s.calories > 200).slice(0, 5);
+        filteredSnacks = snacks.filter(s => s.calories > 200);
       } else {
-        suggested = snacks.filter(s => s.calories <= 200).slice(0, 5);
+        filteredSnacks = snacks.filter(s => s.calories <= 200);
       }
+      // Shuffle and pick 5
+      suggested = filteredSnacks
+        .slice() // copy array
+        .sort(() => 0.5 - Math.random())
+        .slice(0, 5);
     } else if (selectedOption === 'Pre workout' && selectedIntensity) {
       suggested = getPreWorkoutSnacksByIntensity(selectedIntensity);
     }
