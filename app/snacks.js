@@ -13,6 +13,14 @@ import { SnackStepContext } from '../context/SnackStepContext';
 import { PRE_WORKOUT_SNACKS } from '../data/PreWorkoutSuggestions.js';
 import { snacks } from '../data/SnackSuggestions.js';
 
+// Categories for after workout snacks if no recent workouts
+const SNACK_CATEGORIES = [
+  { key: 'quick', label: 'Quick Energy', filter: s => s.calories <= 120 },
+  { key: 'protein', label: 'Protein Boost', filter: s => s.description?.toLowerCase().includes('protein') },
+  { key: 'lowcal', label: 'Low Calorie', filter: s => s.calories <= 80 },
+  { key: 'filling', label: 'Filling', filter: s => s.calories > 150 },
+];
+
 export default function SnackSuggestionTab() {
   const { step, setStep } = useContext(SnackStepContext);
 
@@ -60,19 +68,33 @@ export default function SnackSuggestionTab() {
   const handleShowSnacks = () => {
     let suggested = [];
 
-    if (selectedOption === 'After workout' && selectedWorkout) {
-      // Basic filter: more calories burned = higher-calorie snacks
-      let filteredSnacks;
-      if (selectedWorkout.caloriesBurned > 400) {
-        filteredSnacks = snacks.filter(s => s.calories > 200);
-      } else {
-        filteredSnacks = snacks.filter(s => s.calories <= 200);
+    if (selectedOption === 'After workout') {
+      if (selectedWorkout) {
+        // User picked a workout: filter by calories burned
+        let filteredSnacks;
+        if (selectedWorkout.caloriesBurned > 400) {
+          filteredSnacks = snacks.filter(s => s.calories > 200);
+        } else {
+          filteredSnacks = snacks.filter(s => s.calories <= 200);
+        }
+        // Shuffle and pick 5
+        suggested = filteredSnacks
+          .slice()
+          .sort(() => 0.5 - Math.random())
+          .slice(0, 5);
+      } 
+      
+      // No workouts: show one random snack per category
+      else if (recentWorkouts.length === 0) {
+        suggested = SNACK_CATEGORIES.map(cat => {
+          const filtered = snacks.filter(cat.filter);
+          if (!filtered.length) return null;
+          return {
+            ...filtered[Math.floor(Math.random() * filtered.length)],
+            _category: cat.label,
+          };
+        }).filter(Boolean); // Remove nulls
       }
-      // Shuffle and pick 5
-      suggested = filteredSnacks
-        .slice() // copy array
-        .sort(() => 0.5 - Math.random())
-        .slice(0, 5);
     } else if (selectedOption === 'Pre workout' && selectedIntensity) {
       suggested = getPreWorkoutSnacksByIntensity(selectedIntensity);
     }
@@ -224,9 +246,15 @@ export default function SnackSuggestionTab() {
       <Modal visible={showAfterModal} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>Select one of your last 3 workouts</Text>
+            <Text style={styles.modalTitle}>
+              {recentWorkouts.length === 0
+                ? 'No recent workouts found'
+                : 'Select one of your last 3 workouts'}
+            </Text>
             {recentWorkouts.length === 0 ? (
-              <Text>No recent workouts found.</Text>
+              <Text style={[styles.subtitle, { textAlign: 'center', marginBottom: 18, fontSize: 15 }]}>
+                Save a workout through the Calories tab or see random suggestions
+              </Text>
             ) : (
               recentWorkouts.map((workout, index) => (
                 <Pressable
@@ -253,7 +281,7 @@ export default function SnackSuggestionTab() {
               <Pressable
                 style={[styles.confirmButton, { marginLeft: 10 }]}
                 onPress={handleShowSnacks}
-                disabled={!selectedWorkout}
+                disabled={recentWorkouts.length !== 0 && !selectedWorkout}
               >
                 <Text style={styles.confirmButtonText}>Show Snacks</Text>
               </Pressable>
