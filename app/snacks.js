@@ -137,7 +137,7 @@ export default function SnackSuggestionTab() {
       <Text style={styles.title}>Snack suggestion</Text>
 
       <View style={styles.optionGroupCard}>
-        <Text style={styles.subtitle}>Select a snack for:</Text>
+                <Text style={[styles.subtitle, { fontWeight: 'bold' }]}>Select a snack for:</Text>
 
         <Pressable style={styles.radioButtonContainer} onPress={() => setSelectedOption('Pre workout')}>
           <View style={styles.radioButtonOuter}>

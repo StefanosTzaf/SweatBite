@@ -149,7 +149,7 @@ export default function HomeScreen() {
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.fullWidthModal}>
-            <Text style={styles.modalTitle}>Select Workout</Text>
+            <Text style={styles.modalTitle}>Select workout type</Text>
 
             <ScrollView style={{ maxHeight: '85%', marginBottom: 10 }}>
               {workoutData.map((item) => (
@@ -216,6 +216,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#e6f4ea',
     marginBottom: 10,
+    marginTop: 10,
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',

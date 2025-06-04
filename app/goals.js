@@ -187,7 +187,7 @@ export default function GoalsTab() {
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
             </Pressable>
             <Pressable style={[styles.button]} onPress={handleSaveGoalType}>
-              <Text style={styles.buttonText}>Save</Text>
+              <Text style={styles.buttonText}>Confirm</Text>
             </Pressable>
           </View>
         </View>
@@ -217,7 +217,7 @@ export default function GoalsTab() {
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
             </Pressable>
             <Pressable style={styles.button} onPress={handleSaveCaloriesPeriod}>
-              <Text style={styles.buttonText}>Save</Text>
+              <Text style={styles.buttonText}>Confirm</Text>
             </Pressable>
           </View>
         </View>
@@ -269,7 +269,7 @@ export default function GoalsTab() {
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
             </Pressable>
             <Pressable style={styles.button} onPress={handleSaveWorkoutsGoal}>
-              <Text style={styles.buttonText}>Save</Text>
+              <Text style={styles.buttonText}>Confirm</Text>
             </Pressable>
           </View>
         </View>
