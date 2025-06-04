@@ -113,7 +113,11 @@ export default function GoalsTab() {
   };
 
   const renderProgressCard = (goal, index) => {
-    const percentage = goal.progress / goal.target;
+    // Prevent division by zero or undefined
+    const percentage =
+      typeof goal.target === 'number' && goal.target > 0
+        ? goal.progress / goal.target
+        : 0;
     let label = '';
     if (goal.type === 'Number of workouts per week') {
       label = `${goal.progress} / ${goal.target} workouts done`;
@@ -144,7 +148,7 @@ export default function GoalsTab() {
           <Text style={styles.title}>Your current goals</Text>
           {goals.length === 0 ? (
             <>
-              <Text style={styles.subtitle}>No goals yet</Text>
+              <Text style={[styles.subtitle, { paddingTop: 200 }]}>No goals yet</Text>
               <Text style={styles.subtitle}>Tap + to set your first goal</Text>
             </>
           ) : (
@@ -179,11 +183,11 @@ export default function GoalsTab() {
             );
           })}
           <View style={styles.buttonRow}>
-            <Pressable style={[styles.button]} onPress={handleSaveGoalType}>
-              <Text style={styles.buttonText}>Save</Text>
-            </Pressable>
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
+            </Pressable>
+            <Pressable style={[styles.button]} onPress={handleSaveGoalType}>
+              <Text style={styles.buttonText}>Save</Text>
             </Pressable>
           </View>
         </View>
@@ -209,11 +213,11 @@ export default function GoalsTab() {
             );
           })}
           <View style={styles.buttonRow}>
-            <Pressable style={styles.button} onPress={handleSaveCaloriesPeriod}>
-              <Text style={styles.buttonText}>Save</Text>
-            </Pressable>
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
+            </Pressable>
+            <Pressable style={styles.button} onPress={handleSaveCaloriesPeriod}>
+              <Text style={styles.buttonText}>Save</Text>
             </Pressable>
           </View>
         </View>
@@ -238,11 +242,11 @@ export default function GoalsTab() {
             maximumTrackTintColor="#ddd"
           />
           <View style={styles.buttonRow}>
-            <Pressable style={styles.button} onPress={handleSaveCaloriesTarget}>
-              <Text style={styles.buttonText}>Save</Text>
-            </Pressable>
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
+            </Pressable>
+            <Pressable style={styles.button} onPress={handleSaveCaloriesTarget}>
+              <Text style={styles.buttonText}>Save</Text>
             </Pressable>
           </View>
         </View>
@@ -261,11 +265,11 @@ export default function GoalsTab() {
             maximumTrackTintColor="#ddd"
           />
           <View style={styles.buttonRow}>
-            <Pressable style={styles.button} onPress={handleSaveWorkoutsGoal}>
-              <Text style={styles.buttonText}>Save</Text>
-            </Pressable>
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
+            </Pressable>
+            <Pressable style={styles.button} onPress={handleSaveWorkoutsGoal}>
+              <Text style={styles.buttonText}>Save</Text>
             </Pressable>
           </View>
         </View>
