@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import { SnackStepContext } from '../context/SnackStepContext';
+import { PRE_WORKOUT_SNACKS } from '../data/PreWorkoutSuggestions.js';
 import { snacks } from '../data/SnackSuggestions.js';
 
 export default function SnackSuggestionTab() {
@@ -26,6 +27,7 @@ export default function SnackSuggestionTab() {
 
   const handleFirstConfirm = () => {
     if (selectedOption === 'Pre workout') {
+      setSelectedIntensity(null); // Reset intensity each time modal opens
       setShowPreModal(true);
     } else if (selectedOption === 'After workout') {
       fetchRecentWorkouts();
@@ -46,14 +48,13 @@ export default function SnackSuggestionTab() {
 
   const getPreWorkoutSnacksByIntensity = (intensity) => {
     if (!intensity) return [];
-    if (intensity === 'Low') {
-      return snacks.filter(s => s.calories <= 150).slice(0, 5);
-    } else if (intensity === 'Medium') {
-      return snacks.filter(s => s.calories > 150 && s.calories <= 220).slice(0, 5);
-    } else if (intensity === 'High') {
-      return snacks.filter(s => s.calories > 220).slice(0, 5);
-    }
-    return [];
+    const snacksForIntensity = PRE_WORKOUT_SNACKS && PRE_WORKOUT_SNACKS[intensity];
+    if (!Array.isArray(snacksForIntensity)) return [];
+    // Shuffle and pick 5
+    return snacksForIntensity
+      .slice() // copy array to avoid mutating original
+      .sort(() => 0.5 - Math.random())
+      .slice(0, 5);
   };
 
   const handleShowSnacks = () => {
@@ -192,7 +193,13 @@ export default function SnackSuggestionTab() {
             ))}
 
             <View style={styles.modalActions}>
-              <Pressable style={styles.cancelButton} onPress={() => setShowPreModal(false)}>
+              <Pressable
+                style={styles.cancelButton}
+                onPress={() => {
+                  setShowPreModal(false);
+                  setSelectedIntensity(null); // Reset intensity on cancel
+                }}
+              >
                 <Text style={styles.confirmButtonText}>Cancel</Text>
               </Pressable>
               <Pressable
