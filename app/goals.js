@@ -144,7 +144,7 @@ export default function GoalsTab() {
         </Text>
         <ProgressBar
           progress={percentage}
-          color={isCompleted ? 'gray' : 'green'}
+          color={isCompleted ? 'green' : 'gray'}
           style={styles.progressBar}
         />
         <Text
@@ -167,6 +167,9 @@ export default function GoalsTab() {
       {!showSetGoal ? (
         <>
           <Text style={styles.title}>Your current goals</Text>
+          <Text style={[styles.subtitle, {textAlign: 'left'}, {fontSize: 14}]}>
+            Choose what you want to focus on and track your progress
+          </Text>
           {goals.length === 0 ? (
             <>
               <Text style={[styles.subtitle, { paddingTop: 200 }]}>No goals yet</Text>
@@ -266,7 +269,14 @@ export default function GoalsTab() {
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
             </Pressable>
-            <Pressable style={styles.button} onPress={handleSaveCaloriesTarget}>
+            <Pressable
+              style={[
+                styles.button,
+                caloriesTarget === 0 && { backgroundColor: '#ccc' }
+              ]}
+              onPress={handleSaveCaloriesTarget}
+              disabled={caloriesTarget === 0}
+            >
               <Text style={styles.buttonText}>Save</Text>
             </Pressable>
           </View>
@@ -289,7 +299,14 @@ export default function GoalsTab() {
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
             </Pressable>
-            <Pressable style={styles.button} onPress={handleSaveWorkoutsGoal}>
+            <Pressable
+              style={[
+                styles.button,
+                workoutsPerWeek === 0 && { backgroundColor: '#ccc' }
+              ]}
+              onPress={handleSaveWorkoutsGoal}
+              disabled={workoutsPerWeek === 0}
+            >
               <Text style={styles.buttonText}>Confirm</Text>
             </Pressable>
           </View>
