@@ -60,7 +60,6 @@ export default function GoalsTab() {
   };
 
   const handleSaveGoalType = () => {
-    if (!selectedGoalType) return alert('Please select a goal type');
     if (selectedGoalType === 'Calories burned') {
       setStep(2);
     } else {
@@ -69,7 +68,6 @@ export default function GoalsTab() {
   };
 
   const handleSaveCaloriesPeriod = () => {
-    if (!caloriesPeriod) return alert('Please select daily or weekly');
     setStep(3);
   };
 
@@ -164,6 +162,22 @@ export default function GoalsTab() {
 
   return (
     <View style={styles.container}>
+      {showSetGoal && (
+        <Pressable
+         onPress={() => {
+          if (step === 1) {
+            setShowSetGoal(false);
+            } else if (step === 3 && selectedGoalType === 'Number of workouts per week') {
+              setStep(1);
+            } else {
+              setStep((prev) => prev - 1);
+            }
+          }}
+          style={styles.backArrow}
+        >
+          <Icon name="arrow-left" size={24} color="#333" />
+        </Pressable>
+      )}
       {!showSetGoal ? (
         <>
           <Text style={styles.title}>Your current goals</Text>
@@ -210,7 +224,14 @@ export default function GoalsTab() {
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
             </Pressable>
-            <Pressable style={[styles.button]} onPress={handleSaveGoalType}>
+            <Pressable
+              style={[
+                styles.button,
+                !selectedGoalType && styles.confirmButtonDisabled
+              ]}
+              onPress={handleSaveGoalType}
+              disabled={!selectedGoalType}
+            >
               <Text style={styles.buttonText}>Confirm</Text>
             </Pressable>
           </View>
@@ -240,7 +261,14 @@ export default function GoalsTab() {
             <Pressable style={[styles.button, styles.cancelButton]} onPress={handleCancel}>
               <Text style={[styles.buttonText, styles.cancelButtonText]}>Cancel</Text>
             </Pressable>
-            <Pressable style={styles.button} onPress={handleSaveCaloriesPeriod}>
+            <Pressable
+              style={[
+                styles.button,
+                !caloriesPeriod && styles.confirmButtonDisabled
+              ]}
+              onPress={handleSaveCaloriesPeriod}
+              disabled={!caloriesPeriod}
+            >
               <Text style={styles.buttonText}>Confirm</Text>
             </Pressable>
           </View>
@@ -272,7 +300,7 @@ export default function GoalsTab() {
             <Pressable
               style={[
                 styles.button,
-                caloriesTarget === 0 && { backgroundColor: '#ccc' }
+                caloriesTarget === 0 && styles.confirmButtonDisabled
               ]}
               onPress={handleSaveCaloriesTarget}
               disabled={caloriesTarget === 0}
@@ -302,7 +330,7 @@ export default function GoalsTab() {
             <Pressable
               style={[
                 styles.button,
-                workoutsPerWeek === 0 && { backgroundColor: '#ccc' }
+                workoutsPerWeek === 0 && styles.confirmButtonDisabled
               ]}
               onPress={handleSaveWorkoutsGoal}
               disabled={workoutsPerWeek === 0}
@@ -372,6 +400,17 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 10,
     right: 10,
+    padding: 4,
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 1.5,
+    zIndex: 1,
+    borderWidth: 1,
+    borderColor: '#ddd',
   },
   progressBar: {
     height: 10,
@@ -444,6 +483,9 @@ const styles = StyleSheet.create({
   cancelButton: {
     backgroundColor: '#ccc',
   },
+  confirmButtonDisabled: {
+    backgroundColor: '#ccc',
+  },
   buttonText: {
     color: 'white',
     fontWeight: 'bold',
@@ -469,5 +511,11 @@ const styles = StyleSheet.create({
   sliderLabelMax: {
     fontSize: 10,
   },
+  backArrow: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 10,
+    padding: 10,
+  },
 });
-

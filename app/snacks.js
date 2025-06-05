@@ -166,7 +166,7 @@ export default function SnackSuggestionTab() {
       <Text style={styles.title}>Snack suggestion</Text>
 
       <View style={styles.optionGroupCard}>
-                <Text style={[styles.subtitle, { fontWeight: 'bold' }]}>Select a snack for:</Text>
+        <Text style={[styles.subtitle, { fontWeight: 'bold' }]}>Select a snack for:</Text>
 
         <Pressable style={styles.radioButtonContainer} onPress={() => setSelectedOption('Pre workout')}>
           <View style={styles.radioButtonOuter}>
@@ -231,7 +231,11 @@ export default function SnackSuggestionTab() {
                 <Text style={styles.confirmButtonText}>Cancel</Text>
               </Pressable>
               <Pressable
-                style={[styles.confirmButton, { marginLeft: 10 }]}
+                style={[
+                  styles.confirmButton,
+                  { marginLeft: 10 },
+                  !selectedIntensity && styles.confirmButtonDisabled
+                ]}
                 onPress={handleShowSnacks}
                 disabled={!selectedIntensity}
               >
@@ -259,17 +263,25 @@ export default function SnackSuggestionTab() {
               recentWorkouts.map((workout, index) => (
                 <Pressable
                   key={index}
-                  style={[
-                    styles.workoutItem,
-                    selectedWorkout?.id === workout.id && styles.workoutItemSelected,
-                  ]}
+                  style={styles.workoutItem}
                   onPress={() => setSelectedWorkout(workout)}
                 >
-                  <Text style={styles.workoutText}>{workout.emoji} {workout.type}</Text>
-                  <Text style={styles.workoutDetails}>
-                    Duration: {workout.duration} mins | 🔥 {workout.caloriesBurned} kcal
-                  </Text>
-                  <Text style={styles.workoutDate}>🕒 {new Date(workout.date).toLocaleString()}</Text>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.workoutText}>{workout.emoji} {workout.type}</Text>
+                    <Text style={styles.workoutDetails}>
+                      Duration: {workout.duration} mins | 🔥 {workout.caloriesBurned} kcal
+                    </Text>
+                    <Text style={styles.workoutDate}>🕒 {new Date(workout.date).toLocaleString()}</Text>
+                  </View>
+                  <View style={styles.circleWrapper}>
+                    {selectedWorkout?.id === workout.id ? (
+                      <View style={styles.circleSelected}>
+                        <Text style={styles.tick}>✓</Text>
+                      </View>
+                    ) : (
+                      <View style={styles.circleUnselected} />
+                    )}
+                  </View>
                 </Pressable>
               ))
             )}
@@ -279,7 +291,11 @@ export default function SnackSuggestionTab() {
                 <Text style={styles.confirmButtonText}>Cancel</Text>
               </Pressable>
               <Pressable
-                style={[styles.confirmButton, { marginLeft: 10 }]}
+                style={[
+                  styles.confirmButton,
+                  { marginLeft: 10 },
+                  (recentWorkouts.length !== 0 && !selectedWorkout) && styles.confirmButtonDisabled
+                ]}
                 onPress={handleShowSnacks}
                 disabled={recentWorkouts.length !== 0 && !selectedWorkout}
               >
@@ -350,7 +366,11 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   confirmButtonText: { color: 'white', fontWeight: 'bold', fontSize: 16 },
-
+  
+  confirmButtonDisabled: {
+    backgroundColor: 'gray',
+  },
+  
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',
@@ -379,10 +399,38 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 12,
     marginBottom: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  workoutItemSelected: {
-    borderColor: 'green',
+  circleWrapper: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginLeft: 16,
+    marginTop: 2,
+  },
+  circleUnselected: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
     borderWidth: 2,
+    borderColor: '#555',
+    backgroundColor: '#fff',
+  },
+  circleSelected: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: 'green',
+    backgroundColor: '#e6f4ea',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  tick: {
+    color: 'green',
+    fontWeight: 'bold',
+    fontSize: 16,
+    lineHeight: 20,
   },
   workoutText: {
     fontSize: 18,

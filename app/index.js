@@ -170,6 +170,7 @@ export default function HomeScreen() {
             </ScrollView>
 
             <Pressable
+              style={styles.modalCancelButton}
               onPress={() => {
                 Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setModalVisible(false);
@@ -319,13 +320,21 @@ const styles = StyleSheet.create({
     backgroundColor: '#e6f4ea',
     marginBottom: 15,
   },
+  modalCancelButton: {
+    marginTop: 10,
+    marginBottom: 10,
+    alignSelf: 'center',
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    backgroundColor: '#fbe9e7',
+    borderRadius: 20,
+  },
   modalCancel: {
-    marginTop: 15,
     textAlign: 'center',
     color: 'tomato',
     fontWeight: 'bold',
+    fontSize: 16,
   },
-
   snackMessage: {
     position: 'absolute',
     bottom: 20,
