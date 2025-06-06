@@ -110,55 +110,94 @@ export default function GoalsTab() {
     return value.toString();
   };
 
-  const renderProgressCard = (goal, index) => {
-    // Clamp percentage to 1 (100%) and check if completed
-    const percentage =
-      typeof goal.target === 'number' && goal.target > 0
-        ? Math.min(goal.progress / goal.target, 1)
-        : 0;
-    const isCompleted = goal.progress >= goal.target;
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    return date.toLocaleDateString();
+  };
 
-    let label = '';
-    if (isCompleted) {
-      label = '🎉 Completed!';
-    } else if (goal.type === 'Number of workouts per week') {
-      label = `${goal.progress} / ${goal.target} workouts done`;
-    } else {
-      label = `${goal.progress} / ${goal.target} calories burned`;
+ // Helper to get week range string (e.g., 01/01/2022-08/01/2022)
+const getWeekRange = (dateString) => {
+  const date = dateString ? new Date(dateString) : new Date();
+  // Get first day of week (Monday)
+  const day = date.getDay();
+  const diffToMonday = (day === 0 ? -6 : 1) - day;
+  const monday = new Date(date);
+  monday.setDate(date.getDate() + diffToMonday);
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const format = (d) =>
+    `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+
+  return `${format(monday)} - ${format(sunday)}`;
+};
+
+const renderProgressCard = (goal, index) => {
+  // Clamp percentage to 1 (100%) and check if completed
+  const percentage =
+    typeof goal.target === 'number' && goal.target > 0
+      ? Math.min(goal.progress / goal.target, 1)
+      : 0;
+  const isCompleted = goal.progress >= goal.target;
+
+  let label = '';
+  if (isCompleted) {
+    label = '🎉 Completed!';
+  } else if (goal.type === 'Number of workouts per week') {
+    label = `${goal.progress} / ${goal.target} workouts done`;
+  } else {
+    label = `${goal.progress} / ${goal.target} calories burned`;
+  }
+
+  // Add period/date info
+  let periodInfo = '';
+  if (goal.type === 'Calories burned') {
+    if (goal.period === 'Daily') {
+      periodInfo = `Date: ${formatDate(goal.date || new Date())}`;
+    } else if (goal.period === 'Weekly') {
+      periodInfo = `Period: ${getWeekRange(goal.date)}`;
     }
+  } else if (goal.type === 'Number of workouts per week') {
+    periodInfo = `Week: ${getWeekRange(goal.date)}`;
+  }
 
-    return (
-      <View
-        key={index}
+  return (
+    <View
+      key={index}
+      style={[
+        styles.goalCard,
+        isCompleted && { opacity: 0.6, borderColor: 'green', borderWidth: 2 },
+      ]}
+    >
+      <Text style={styles.goalTitleBig}>
+        {goal.type === 'Number of workouts per week'
+          ? `Do ${goal.target} workouts this week`
+          : `Burn ${goal.target} calories (${goal.period})`}
+      </Text>
+      {periodInfo ? (
+        <Text style={styles.periodInfoText}>
+          {periodInfo}
+        </Text>
+      ) : null}
+      <ProgressBar
+        progress={percentage}
+        color={isCompleted ? 'green' : 'gray'}
+        style={styles.progressBar}
+      />
+      <Text
         style={[
-          styles.goalCard,
-          isCompleted && { opacity: 0.6, borderColor: 'green', borderWidth: 2 },
+          styles.goalSubtitle,
+          isCompleted && { color: 'green', fontWeight: 'bold' },
         ]}
       >
-        <Text style={styles.goalTitle}>
-          {goal.type === 'Number of workouts per week'
-            ? `Do ${goal.target} workouts this week`
-            : `Burn ${goal.target} calories (${goal.period})`}
-        </Text>
-        <ProgressBar
-          progress={percentage}
-          color={isCompleted ? 'green' : 'gray'}
-          style={styles.progressBar}
-        />
-        <Text
-          style={[
-            styles.goalSubtitle,
-            isCompleted && { color: 'green', fontWeight: 'bold' },
-          ]}
-        >
-          {label}
-        </Text>
-        <Pressable onPress={() => handleDeleteGoal(index)} style={styles.trashIcon}>
-          <Icon name="trash-2" size={22} color="#900" />
-        </Pressable>
-      </View>
-    );
-  };
+        {label}
+      </Text>
+      <Pressable onPress={() => handleDeleteGoal(index)} style={styles.trashIcon}>
+        <Icon name="trash-2" size={22} color="#900" />
+      </Pressable>
+    </View>
+  );
+};
 
   return (
     <View style={styles.container}>
@@ -287,7 +326,7 @@ export default function GoalsTab() {
             style={{ width: '100%', height: 40 }}
             minimumValue={0}
             maximumValue={maxCalories}
-            step={10}
+            step={50}
             value={caloriesTarget}
             onValueChange={setCaloriesTarget}
             minimumTrackTintColor="green"
@@ -517,5 +556,18 @@ const styles = StyleSheet.create({
     left: 20,
     zIndex: 10,
     padding: 10,
+  },
+    goalTitleBig: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    textAlign: 'center',
+    marginBottom: 10,
+  },
+  periodInfoText: {
+    fontSize: 13,
+    color: '#444',
+    textAlign: 'center',
+    marginBottom: 6,
+    fontWeight: 'bold',
   },
 });

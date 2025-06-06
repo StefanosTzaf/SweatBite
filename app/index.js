@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import * as Haptics from 'expo-haptics';
+
 import { MaterialIcons } from '@expo/vector-icons';
 import {
   View,
@@ -65,7 +65,6 @@ export default function HomeScreen() {
       await updateGoalProgress('Calories burned', undefined, caloriesBurned);
       await updateGoalProgress('Number of workouts per week', undefined, 1);
 
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       Alert.alert('Saved', 'Your workout was saved successfully!');
       setSelectedWorkout(null);
       setDuration(15);
@@ -85,7 +84,6 @@ export default function HomeScreen() {
       <Pressable
         style={styles.workoutBox}
         onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
           setModalVisible(true);
         }}
       >
@@ -112,22 +110,21 @@ export default function HomeScreen() {
         )}
 
         <View style={styles.sliderWrapper}>
-          <Text style={styles.sliderEdgeLabel}>15 min</Text>
+          <Text style={styles.sliderEdgeLabel}>5 min</Text>
           <Slider
             style={styles.slider}
-            minimumValue={15}
-            maximumValue={120}
-            step={1}
+            minimumValue={5}
+            maximumValue={180}
+            step={5}
             value={duration}
             onValueChange={(val) => {
               setDuration(Math.round(val));
-              Haptics.selectionAsync();
             }}
             minimumTrackTintColor="tomato"
             maximumTrackTintColor="#ccc"
             thumbTintColor="tomato"
           />
-          <Text style={styles.sliderEdgeLabel}>120 min</Text>
+          <Text style={styles.sliderEdgeLabel}>180 min</Text>
         </View>
       </View>
 
@@ -157,7 +154,6 @@ export default function HomeScreen() {
                   key={item.name}
                   onPress={() => {
                     setSelectedWorkout(item);
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
                     setModalVisible(false);
                   }}
                   style={styles.modalWorkoutBox}
@@ -172,7 +168,6 @@ export default function HomeScreen() {
             <Pressable
               style={styles.modalCancelButton}
               onPress={() => {
-                Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                 setModalVisible(false);
               }}
             >
