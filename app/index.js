@@ -123,6 +123,7 @@ export default function HomeScreen() {
             minimumTrackTintColor="tomato"
             maximumTrackTintColor="#ccc"
             thumbTintColor="tomato"
+            
           />
           <Text style={styles.sliderEdgeLabel}>180 min</Text>
         </View>

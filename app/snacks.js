@@ -9,6 +9,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { MaterialIcons } from '@expo/vector-icons';
 import { SnackStepContext } from '../context/SnackStepContext';
 import { PRE_WORKOUT_SNACKS } from '../data/PreWorkoutSuggestions.js';
 import { snacks } from '../data/SnackSuggestions.js';
@@ -135,7 +136,14 @@ export default function SnackSuggestionTab() {
 
     return (
       <View style={styles.container}>
-        <Text style={styles.title}>{snackListTitle}</Text>
+        {/* Back arrow at top left */}
+        <Pressable
+          style={styles.backArrow}
+          onPress={handleBack}
+        >
+          <MaterialIcons name="arrow-back" size={28} color="#222" />
+        </Pressable>
+        <Text style={[styles.title, { marginTop: 40 }]}>{snackListTitle}</Text>
         {snackListDescription ? (
           <Text style={styles.subtitle}>{snackListDescription}</Text>
         ) : null}
@@ -151,9 +159,6 @@ export default function SnackSuggestionTab() {
             </View>
           ))}
         </ScrollView>
-        <Pressable style={styles.confirmButton} onPress={handleBack}>
-          <Text style={styles.confirmButtonText}>Back</Text>
-        </Pressable>
       </View>
     );
   }
@@ -478,4 +483,11 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: '#666',
   },
-});
+  backArrow: {
+    position: 'absolute',
+    top: 18,
+    left: 10,
+    zIndex: 10,
+    padding: 8,
+  },
+});1
