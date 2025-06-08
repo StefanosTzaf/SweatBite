@@ -71,8 +71,62 @@ export default function GoalsTab() {
     setStep(3);
   };
 
+  // NEW: AddGoal counts previous workouts in the correct period
   const addGoal = async (goal) => {
-    const updatedGoals = [...goals, goal];
+    const stored = await AsyncStorage.getItem('workouts');
+    const workouts = stored ? JSON.parse(stored) : [];
+    let progress = 0;
+    const now = new Date();
+
+    if (goal.type === 'Calories burned') {
+      if (goal.period === 'Daily') {
+        // Only workouts from today
+        progress = workouts
+          .filter(w => {
+            const d = new Date(w.date);
+            return (
+              d.getFullYear() === now.getFullYear() &&
+              d.getMonth() === now.getMonth() &&
+              d.getDate() === now.getDate()
+            );
+          })
+          .reduce((sum, w) => sum + w.caloriesBurned, 0);
+      } else if (goal.period === 'Weekly') {
+        // Only workouts from this week (Monday-Sunday)
+        const day = now.getDay();
+        const diffToMonday = (day === 0 ? -6 : 1) - day;
+        const monday = new Date(now);
+        monday.setHours(0, 0, 0, 0);
+        monday.setDate(now.getDate() + diffToMonday);
+        const sunday = new Date(monday);
+        sunday.setDate(monday.getDate() + 6);
+        sunday.setHours(23, 59, 59, 999);
+
+        progress = workouts
+          .filter(w => {
+            const d = new Date(w.date);
+            return d >= monday && d <= sunday;
+          })
+          .reduce((sum, w) => sum + w.caloriesBurned, 0);
+      }
+    } else if (goal.type === 'Number of workouts per week') {
+      // Only workouts from this week (Monday-Sunday)
+      const day = now.getDay();
+      const diffToMonday = (day === 0 ? -6 : 1) - day;
+      const monday = new Date(now);
+      monday.setHours(0, 0, 0, 0);
+      monday.setDate(now.getDate() + diffToMonday);
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+      sunday.setHours(23, 59, 59, 999);
+
+      progress = workouts.filter(w => {
+        const d = new Date(w.date);
+        return d >= monday && d <= sunday;
+      }).length;
+    }
+
+    const updatedGoals = [...goals, { ...goal, progress }];
     await saveGoals(updatedGoals);
     setShowSetGoal(false);
   };
@@ -82,7 +136,7 @@ export default function GoalsTab() {
       type: 'Calories burned',
       period: caloriesPeriod,
       target: caloriesTarget,
-      progress: 0,
+      // progress υπολογίζεται στο addGoal
     });
   };
 
@@ -90,7 +144,7 @@ export default function GoalsTab() {
     addGoal({
       type: 'Number of workouts per week',
       target: workoutsPerWeek,
-      progress: 0,
+      // progress υπολογίζεται στο addGoal
     });
   };
 
@@ -557,7 +611,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     padding: 10,
   },
-    goalTitleBig: {
+  goalTitleBig: {
     fontWeight: 'bold',
     fontSize: 18,
     textAlign: 'center',
