@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { SnackStepContext } from '../context/SnackStepContext';
-import { PRE_WORKOUT_SNACKS } from '../data/PreWorkoutSuggestions.js';
 import { snacks } from '../data/SnackSuggestions.js';
 
 // Categories for after workout snacks if no recent workouts
@@ -21,6 +20,25 @@ const SNACK_CATEGORIES = [
   { key: 'lowcal', label: 'Low Calorie', filter: s => s.calories <= 80 },
   { key: 'filling', label: 'Filling', filter: s => s.calories > 150 },
 ];
+
+// Helper: Get random snacks from SnackSuggestions.js by intensity
+const getPreWorkoutSnacksByIntensity = (intensity) => {
+  if (!intensity) return [];
+  let min = 0, max = Infinity;
+  if (intensity === 'Low') {
+    min = 0; max = 160;
+  } else if (intensity === 'Medium') {
+    min = 161; max = 230;
+  } else if (intensity === 'High') {
+    min = 231; max = Infinity;
+  }
+  const filtered = snacks.filter(s => s.calories >= min && s.calories <= max);
+  // Shuffle and pick 5
+  return filtered
+    .slice()
+    .sort(() => 0.5 - Math.random())
+    .slice(0, 5);
+};
 
 export default function SnackSuggestionTab() {
   const { step, setStep } = useContext(SnackStepContext);
@@ -33,6 +51,8 @@ export default function SnackSuggestionTab() {
   const [recentWorkouts, setRecentWorkouts] = useState([]);
   const [view, setView] = useState('selection'); // 'selection' | 'snackList'
   const [suggestedSnacks, setSuggestedSnacks] = useState([]);
+  const [snackModalVisible, setSnackModalVisible] = useState(false);
+  const [snackModalData, setSnackModalData] = useState(null);
 
   const handleFirstConfirm = () => {
     if (selectedOption === 'Pre workout') {
@@ -55,17 +75,6 @@ export default function SnackSuggestionTab() {
     }
   };
 
-  const getPreWorkoutSnacksByIntensity = (intensity) => {
-    if (!intensity) return [];
-    const snacksForIntensity = PRE_WORKOUT_SNACKS && PRE_WORKOUT_SNACKS[intensity];
-    if (!Array.isArray(snacksForIntensity)) return [];
-    // Shuffle and pick 5
-    return snacksForIntensity
-      .slice() // copy array to avoid mutating original
-      .sort(() => 0.5 - Math.random())
-      .slice(0, 5);
-  };
-
   const handleShowSnacks = () => {
     let suggested = [];
 
@@ -84,7 +93,6 @@ export default function SnackSuggestionTab() {
           .sort(() => 0.5 - Math.random())
           .slice(0, 5);
       } 
-      
       // No workouts: show one random snack per category
       else if (recentWorkouts.length === 0) {
         suggested = SNACK_CATEGORIES.map(cat => {
@@ -113,6 +121,16 @@ export default function SnackSuggestionTab() {
     setSuggestedSnacks([]);
     setView('selection');
     setStep(1);
+  };
+
+  const openSnackModal = (snack) => {
+    setSnackModalData(snack);
+    setSnackModalVisible(true);
+  };
+
+  const closeSnackModal = () => {
+    setSnackModalVisible(false);
+    setSnackModalData(null);
   };
 
   // -----------------
@@ -149,16 +167,60 @@ export default function SnackSuggestionTab() {
         ) : null}
         <ScrollView>
           {suggestedSnacks.map((snack, index) => (
-            <View key={index} style={styles.snackCard}>
+            <Pressable
+              key={index}
+              style={styles.snackCard}
+              onPress={() => openSnackModal(snack)}
+            >
               <Text style={styles.snackEmoji}>{snack.emoji}</Text>
               <View style={styles.snackContent}>
                 <Text style={styles.snackTitle}>{snack.name}</Text>
                 <Text style={styles.snackDetails}>{snack.calories} kcal</Text>
                 <Text style={styles.snackDescription}>{snack.description}</Text>
               </View>
-            </View>
+            </Pressable>
           ))}
         </ScrollView>
+
+        {/* Snack Details Modal */}
+        <Modal visible={snackModalVisible} transparent animationType="slide">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalCard}>
+              <Text style={styles.modalTitle}>
+                {snackModalData?.emoji} {snackModalData?.name}
+              </Text>
+              <Text style={styles.snackDetails}>
+                {snackModalData?.calories} kcal
+              </Text>
+              <Text style={styles.snackDescription}>
+                {snackModalData?.description}
+              </Text>
+              {/* Show extra details for both Pre and After workout */}
+              {snackModalData?.details && (
+                <View style={{ marginTop: 16 }}>
+                  <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Why it's good:</Text>
+                  <Text style={{ marginBottom: 8 }}>{snackModalData.details.whyGood}</Text>
+                  <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Serving suggestion:</Text>
+                  <Text style={{ marginBottom: 8 }}>{snackModalData.details.servingSuggestion}</Text>
+                  <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Allergen alert:</Text>
+                  <Text style={{ marginBottom: 8 }}>{snackModalData.details.allergenAlert}</Text>
+                  <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Dietary suitability:</Text>
+                  <Text style={{ marginBottom: 8 }}>{snackModalData.details.dietarySuitability}</Text>
+                  <Text style={{ fontWeight: 'bold', marginBottom: 4 }}>Key vitamins:</Text>
+                  <Text>{snackModalData.details.keyVitamins}</Text>
+                </View>
+              )}
+              <View style={styles.modalActions}>
+                <Pressable
+                  style={styles.cancelButton}
+                  onPress={closeSnackModal}
+                >
+                  <Text style={styles.confirmButtonText}>Close</Text>
+                </Pressable>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     );
   }
@@ -490,4 +552,4 @@ const styles = StyleSheet.create({
     zIndex: 10,
     padding: 8,
   },
-});1
+});

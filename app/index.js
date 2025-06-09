@@ -16,7 +16,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GoalsContext } from '../context/GoalsContext';
 
 export default function HomeScreen() {
-  const [duration, setDuration] = useState(15);
+  const [duration, setDuration] = useState(5);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const { goals, updateGoalProgress } = useContext(GoalsContext);
@@ -67,7 +67,7 @@ export default function HomeScreen() {
 
       Alert.alert('Saved', 'Your workout was saved successfully!');
       setSelectedWorkout(null);
-      setDuration(15);
+      setDuration(5);
     } catch (error) {
       Alert.alert('Error', 'Failed to save workout.');
       console.error(error);
@@ -123,7 +123,7 @@ export default function HomeScreen() {
             minimumTrackTintColor="tomato"
             maximumTrackTintColor="#ccc"
             thumbTintColor="tomato"
-            
+            thumbStyle={styles.sliderThumb}
           />
           <Text style={styles.sliderEdgeLabel}>180 min</Text>
         </View>
@@ -260,6 +260,13 @@ const styles = StyleSheet.create({
   slider: {
     flex: 1,
     height: 40,
+    minWidth: 200, // Make slider wider
+    width: '100%',
+    marginHorizontal: 10,
+  },
+  sliderThumb: {
+  width: 6,
+  height: 6,
   },
   sliderEdgeLabel: {
     width: 50,
