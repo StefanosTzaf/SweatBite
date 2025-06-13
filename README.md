@@ -1,15 +1,16 @@
 # SweatBite
 
 SweatBite is a React Native app that helps users set and track fitness goals, such as calories burned or number
-of workouts per week. Users can monitor their progress, manage their goals, and get snack suggestions after 
+of workouts per week. Users can monitor their progress, manage their goals, and get snack suggestions before or after 
 workouts. All data is saved locally using AsyncStorage.
 
 **Main Features:**
+- See calories burned
 - Set and track fitness goals (calories or workouts)
 - Visual progress bars for each goal
-- Add, edit, or delete goals
-- Personalized snack suggestions after workouts
-- Data persists between sessions
+- Add, or delete goals
+- Snack suggestions based on workouts
+
 
 So as to run the app, you need :
 
