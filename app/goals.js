@@ -284,7 +284,7 @@ const renderProgressCard = (goal, index) => {
       {!showSetGoal ? (
         <>
           <Text style={styles.title}>Your current goals</Text>
-          <Text style={[styles.subtitle, {textAlign: 'left'}, {fontSize: 14}]}>
+          <Text style={[styles.subtitle, {textAlign: 'left'}, {fontSize: 17}]}>
             Choose what you want to focus on and track your progress
           </Text>
           {goals.length === 0 ? (
@@ -452,14 +452,15 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: '#fdfdfd',
+    paddingTop: 30,
   },
   title: {
     fontSize: 26,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: 22,
     color: '#555',
     textAlign: 'center',
     marginBottom: 10,

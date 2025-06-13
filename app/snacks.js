@@ -170,6 +170,12 @@ export default function SnackSuggestionTab() {
         {snackListDescription ? (
           <Text style={styles.subtitle}>{snackListDescription}</Text>
         ) : null}
+
+        {/* Label to inform snacks are pressable */}
+        <Text style={{ textAlign: 'center', color: '#2e7d32', marginBottom: 10, fontSize: 16, marginTop: -15 }}>
+          Tap a snack to see more information
+        </Text>
+        
         <ScrollView>
           {suggestedSnacks.map((snack, index) => (
             <Pressable
@@ -236,6 +242,9 @@ export default function SnackSuggestionTab() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Snack suggestion</Text>
+      <Text style={styles.subtitle}>
+        Choose when you want a snack to get personalized suggestions
+      </Text>
 
       <View style={styles.optionGroupCard}>
         <Text style={[styles.subtitle, { fontWeight: 'bold' }]}>Select a snack for:</Text>
@@ -382,8 +391,8 @@ export default function SnackSuggestionTab() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#fdfdfd' },
-  title: { fontWeight: 'bold', fontSize: 24, marginBottom: 30, color: 'black' },
+  container: { flex: 1, padding: 20, paddingTop: 30 ,backgroundColor: '#fdfdfd' },
+  title: { fontWeight: 'bold', fontSize: 26, marginBottom: 10, color: 'black' },
   subtitle: { fontSize: 18, marginBottom: 40, color: '#555' },
 
   optionGroupCard: {

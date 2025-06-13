@@ -201,16 +201,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 30,
     backgroundColor: '#fdfdfd',
   },
   title: {
-    fontSize: 24,
+    fontSize: 26,
     fontWeight: '700',
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 17,
     marginBottom: 30,
     color: '#555',
   },
