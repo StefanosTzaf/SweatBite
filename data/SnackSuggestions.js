@@ -630,7 +630,7 @@ export const snacks = [
   description: "Carbs + protein",
   details: {
     whyGood: "Greek yogurt adds protein while granola provides fiber and slow-digesting carbs.",
-    servingSuggestion: "Serve 150g Greek yogurt with 1/3 cup granola; add fresh berries if θέλεις.",
+    servingSuggestion: "Serve 150g Greek yogurt with 1/3 cup granola; add fresh berries if you want.",
     allergenAlert: "May contain nuts, gluten, dairy",
     dietarySuitability: "Vegetarian",
     keyVitamins: "Calcium, Protein, Fiber"

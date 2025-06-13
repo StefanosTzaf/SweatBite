@@ -136,7 +136,6 @@ export default function GoalsTab() {
       type: 'Calories burned',
       period: caloriesPeriod,
       target: caloriesTarget,
-      // progress υπολογίζεται στο addGoal
     });
   };
 
@@ -144,7 +143,6 @@ export default function GoalsTab() {
     addGoal({
       type: 'Number of workouts per week',
       target: workoutsPerWeek,
-      // progress υπολογίζεται στο addGoal
     });
   };
 
