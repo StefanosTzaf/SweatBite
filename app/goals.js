@@ -37,6 +37,7 @@ export default function GoalsTab() {
   const [caloriesTarget, setCaloriesTarget] = useState(500);
   const [workoutsPerWeek, setWorkoutsPerWeek] = useState(3);
 
+  // Load saved goals on mount
   useEffect(() => {
     const loadGoals = async () => {
       const savedGoals = await AsyncStorage.getItem('goals');
@@ -45,11 +46,13 @@ export default function GoalsTab() {
     loadGoals();
   }, []);
 
+  // Save goals to storage
   const saveGoals = async (newGoals) => {
     setGoals(newGoals);
     await AsyncStorage.setItem('goals', JSON.stringify(newGoals));
   };
 
+  // Start goal creation flow
   const handleAddGoalPress = () => {
     setShowSetGoal(true);
     setStep(1);
@@ -59,6 +62,7 @@ export default function GoalsTab() {
     setWorkoutsPerWeek(3);
   };
 
+  // Step navigation for goal creation
   const handleSaveGoalType = () => {
     if (selectedGoalType === 'Calories burned') {
       setStep(2);
@@ -71,7 +75,7 @@ export default function GoalsTab() {
     setStep(3);
   };
 
-  // NEW: AddGoal counts previous workouts in the correct period
+  // Add a new goal and calculate initial progress
   const addGoal = async (goal) => {
     const stored = await AsyncStorage.getItem('workouts');
     const workouts = stored ? JSON.parse(stored) : [];
@@ -131,6 +135,7 @@ export default function GoalsTab() {
     setShowSetGoal(false);
   };
 
+  // Save calories goal
   const handleSaveCaloriesTarget = () => {
     addGoal({
       type: 'Calories burned',
@@ -139,6 +144,7 @@ export default function GoalsTab() {
     });
   };
 
+  // Save workouts per week goal
   const handleSaveWorkoutsGoal = () => {
     addGoal({
       type: 'Number of workouts per week',
@@ -146,22 +152,27 @@ export default function GoalsTab() {
     });
   };
 
+  // Cancel goal creation
   const handleCancel = () => {
     setShowSetGoal(false);
   };
 
+  // Delete a goal by index
   const handleDeleteGoal = async (index) => {
     const updatedGoals = goals.filter((_, i) => i !== index);
     await saveGoals(updatedGoals);
   };
 
+  // Set slider max based on period
   const maxCalories = caloriesPeriod === 'Weekly' ? 10000 : 1500;
 
+  // Format calories for slider label
   const formatCaloriesLabel = (value) => {
     if (value >= 10000) return `${(value / 1000).toFixed(1)}k`;
     return value.toString();
   };
 
+  // Format ISO date to locale string
   const formatDate = (isoString) => {
     const date = new Date(isoString);
     return date.toLocaleDateString();
@@ -184,6 +195,7 @@ const getWeekRange = (dateString) => {
   return `${format(monday)} - ${format(sunday)}`;
 };
 
+// Renders a progress card for each goal
 const renderProgressCard = (goal, index) => {
   // Clamp percentage to 1 (100%) and check if completed
   const percentage =

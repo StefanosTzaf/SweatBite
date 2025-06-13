@@ -11,10 +11,11 @@ function LayoutContent() {
 
   return (
     <View style={styles.container}>
+      {/* Header section with title and back button */}
       <View style={styles.header}>
         {step === 2 && (
           <Pressable
-            onPress={() => setStep(1)}
+            onPress={() => setStep(1)} // Navigate back to step 1
             style={styles.backButton}
             android_ripple={{ color: '#ccc', borderless: true }}
           >
@@ -25,9 +26,10 @@ function LayoutContent() {
         <Text style={styles.title}>SweatBite</Text>
       </View>
 
+      {/* Tab navigation with custom icons */}
       <Tabs
         screenOptions={({ route }) => ({
-          headerShown: false,
+          headerShown: false, // Hide default header
           tabBarStyle: {
             height: 70,
             paddingBottom: 10,
@@ -40,6 +42,7 @@ function LayoutContent() {
             let emoji = '';
             let fontSize = size;
 
+            // Assign emoji based on route name
             if (route.name === 'index') {
               emoji = '🔥';
               fontSize = size * 0.85;
@@ -54,7 +57,7 @@ function LayoutContent() {
               <Text
                 style={{
                   fontSize,
-                  opacity: focused ? 1 : 0.3,
+                  opacity: focused ? 1 : 0.3, // Adjust opacity based on focus
                 }}
               >
                 {emoji}
@@ -65,6 +68,7 @@ function LayoutContent() {
           tabBarInactiveTintColor: 'gray',
         })}
       >
+        {/* Define screens for the tabs */}
         <Tabs.Screen name="index" options={{ title: 'Calories' }} />
         <Tabs.Screen name="snacks" options={{ title: 'Snacks' }} />
         <Tabs.Screen name="goals" options={{ title: 'Goals' }} />
@@ -73,6 +77,7 @@ function LayoutContent() {
   );
 }
 
+{/* Provide context for goals and snack steps */}
 export default function Layout() {
   return (
       <GoalsProvider>

@@ -21,6 +21,7 @@ export default function HomeScreen() {
   const [selectedWorkout, setSelectedWorkout] = useState(null);
   const { goals, updateGoalProgress } = useContext(GoalsContext);
 
+  // List of available workouts
   const workoutData = [
     { name: 'Cycling', emoji: '🚴', caloriesPerMinute: 8 },
     { name: 'Dancing', emoji: '💃', caloriesPerMinute: 6 },
@@ -36,10 +37,12 @@ export default function HomeScreen() {
     { name: 'Yoga-Pilates', emoji: '🧘', caloriesPerMinute: 3 },
   ];
 
+  // Calculate calories burned for selected workout and duration
   const caloriesBurned = selectedWorkout
     ? selectedWorkout.caloriesPerMinute * duration
     : 0;
 
+  // Save workout to AsyncStorage and update goals
   const handleSaveWorkout = async () => {
     if (!selectedWorkout) {
       Alert.alert('Select workout', 'Please select a workout type first.');
@@ -62,6 +65,7 @@ export default function HomeScreen() {
       workouts.push(newWorkout);
       await AsyncStorage.setItem('workouts', JSON.stringify(workouts));
 
+      // Update user goals
       await updateGoalProgress('Calories burned', undefined, caloriesBurned);
       await updateGoalProgress('Number of workouts per week', undefined, 1);
 
@@ -81,6 +85,7 @@ export default function HomeScreen() {
         Estimate how many calories you burned during your workout.
       </Text>
 
+      {/* Workout type picker */}
       <Pressable
         style={styles.workoutBox}
         onPress={() => {
@@ -95,6 +100,7 @@ export default function HomeScreen() {
         <MaterialIcons name="chevron-right" size={24} color="#555" />
       </Pressable>
 
+      {/* Duration slider */}
       <View style={styles.sliderBox}>
         <Text style={styles.label}>⏱ Duration</Text>
         <Text style={styles.note}>
@@ -129,6 +135,7 @@ export default function HomeScreen() {
         </View>
       </View>
 
+      {/* Save workout button */}
       <Pressable
         style={[
           styles.saveButton,
@@ -144,6 +151,7 @@ export default function HomeScreen() {
         for personalized snacks and more accurate goals
       </Text>
 
+      {/* Workout type selection modal */}
       <Modal visible={modalVisible} transparent animationType="slide">
         <View style={styles.modalOverlay}>
           <View style={styles.fullWidthModal}>
@@ -178,7 +186,7 @@ export default function HomeScreen() {
         </View>
       </Modal>
 
-      {/* Plain snack message at bottom */}
+      {/* Snack suggestion message */}
       {selectedWorkout && (
         <Text style={styles.snackMessage}>
           Want to refuel?{' '}

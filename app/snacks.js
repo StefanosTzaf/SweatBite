@@ -43,6 +43,7 @@ const getPreWorkoutSnacksByIntensity = (intensity) => {
 export default function SnackSuggestionTab() {
   const { step, setStep } = useContext(SnackStepContext);
 
+  // UI state
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedIntensity, setSelectedIntensity] = useState(null);
   const [selectedWorkout, setSelectedWorkout] = useState(null);
@@ -54,6 +55,7 @@ export default function SnackSuggestionTab() {
   const [snackModalVisible, setSnackModalVisible] = useState(false);
   const [snackModalData, setSnackModalData] = useState(null);
 
+  // Handles first step: show intensity or workout modal
   const handleFirstConfirm = () => {
     if (selectedOption === 'Pre workout') {
       setSelectedIntensity(null); // Reset intensity each time modal opens
@@ -64,6 +66,7 @@ export default function SnackSuggestionTab() {
     }
   };
 
+  // Loads recent workouts from storage
   const fetchRecentWorkouts = async () => {
     try {
       const stored = await AsyncStorage.getItem('workouts');
@@ -75,12 +78,13 @@ export default function SnackSuggestionTab() {
     }
   };
 
+  // Suggest snacks based on user selection
   const handleShowSnacks = () => {
     let suggested = [];
 
     if (selectedOption === 'After workout') {
       if (selectedWorkout) {
-        // User picked a workout: filter by calories burned
+        // Suggest snacks based on calories burned in workout
         let filteredSnacks;
         if (selectedWorkout.caloriesBurned > 400) {
           filteredSnacks = snacks.filter(s => s.calories > 200);
@@ -114,6 +118,7 @@ export default function SnackSuggestionTab() {
     setView('snackList');
   };
 
+  // Reset to selection screen
   const handleBack = () => {
     setSelectedOption(null);
     setSelectedIntensity(null);
@@ -123,11 +128,11 @@ export default function SnackSuggestionTab() {
     setStep(1);
   };
 
+  // Open/close snack details modal
   const openSnackModal = (snack) => {
     setSnackModalData(snack);
     setSnackModalVisible(true);
   };
-
   const closeSnackModal = () => {
     setSnackModalVisible(false);
     setSnackModalData(null);
