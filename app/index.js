@@ -187,12 +187,10 @@ export default function HomeScreen() {
       </Modal>
 
       {/* Snack suggestion message */}
-      {selectedWorkout && (
-        <Text style={styles.snackMessage}>
-          Want to refuel?{' '}
-          <Text style={styles.snackLink}>Check the Snacks tab</Text> for healthy options.
-        </Text>
-      )}
+      <Text style={styles.snackMessage}>
+        Want to refuel?{' '}
+        <Text style={styles.snackLink}>Check the Snacks tab</Text> for healthy options.
+      </Text>
     </View>
   );
 }

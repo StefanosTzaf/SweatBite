@@ -172,7 +172,7 @@ export default function SnackSuggestionTab() {
         ) : null}
 
         {/* Label to inform snacks are pressable */}
-        <Text style={{ textAlign: 'center', color: '#2e7d32', marginBottom: 10, fontSize: 16, marginTop: -15 }}>
+        <Text style={{ textAlign: 'center', color: '#2e7d32', fontWeight: 'bold', marginBottom: 10, fontSize: 18, marginTop: -15 }}>
           Tap a snack to see more information
         </Text>
         
